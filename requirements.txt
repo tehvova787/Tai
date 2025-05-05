@@ -63,10 +63,10 @@ bcrypt>=4.0.0
 pymysql>=1.1.0
 
 # Machine learning and AI
-tensorflow-cpu>=2.12.0; python_version >= "3.9"
+# tensorflow-cpu>=2.12.0; python_version >= "3.9"  # Removed as not compatible with Python 3.13
 torch>=2.0.1
 transformers>=4.31.0
-keras>=2.12.0; python_version >= "3.9"
+# keras>=2.12.0; python_version >= "3.9"  # Removed as not compatible with Python 3.13
 
 # Data processing and visualization
 pandas>=2.0.3
@@ -102,6 +102,7 @@ tonsdk>=1.0.15
 # AR/VR support
 pypng>=0.20220715.0
 qrcode>=7.4.2
+# threejs-jupyter>=2.10.0  # Removed as not available in PyPI
 
 # Multimodal and gesture
 mediapipe>=0.10.0
@@ -120,8 +121,8 @@ stable-baselines3>=2.1.0
 # Additional data sources
 snowflake-connector-python>=3.0.4
 azure-cosmos>=4.5.1
-ibm_db>=3.1.5
-ibm_db_dbi>=3.1.4
+# ibm_db>=3.1.5  # Removed as not compatible with Python 3.13
+# ibm_db_dbi>=3.1.4  # Removed as not compatible with Python 3.13
 
 # Additional utilities
 pydantic>=1.9.1
