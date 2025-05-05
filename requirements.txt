@@ -62,12 +62,11 @@ bcrypt>=4.0.0
 # Database integrations
 pymysql>=1.1.0
 
-# Machine learning and AI (with Python 3.13 compatibility)
-tensorflow-cpu>=2.12.0; python_version < "3.12"
-tensorflow-cpu>=2.14.0; python_version >= "3.12"
+# Machine learning and AI
+tensorflow-cpu>=2.12.0; python_version >= "3.9"
 torch>=2.0.1
 transformers>=4.31.0
-keras>=2.12.0; python_version < "3.12"
+keras>=2.12.0; python_version >= "3.9"
 
 # Data processing and visualization
 pandas>=2.0.3
@@ -103,7 +102,6 @@ tonsdk>=1.0.15
 # AR/VR support
 pypng>=0.20220715.0
 qrcode>=7.4.2
-threejs-jupyter>=2.10.0
 
 # Multimodal and gesture
 mediapipe>=0.10.0
