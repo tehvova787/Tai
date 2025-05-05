@@ -407,4 +407,8 @@ if __name__ == "__main__":
     # Initialize and run the web interface without trying to get API key from environment
     # This avoids potential issues with null characters in environment variables
     web_interface = LuckyTrainWebInterfaceDemo(openai_api_key=None)
-    web_interface.run(host="127.0.0.1", port=5000, debug=True) 
+    
+    # Get port from environment variable (for Render deployment)
+    port = int(os.environ.get("PORT", 5000))
+    
+    web_interface.run(host="0.0.0.0", port=port, debug=True) 

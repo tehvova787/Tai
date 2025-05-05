@@ -22,7 +22,7 @@ if __name__ == "__main__":
             print(f"Invalid port number: {sys.argv[1]}. Using default port 5000.")
     
     try:
-        web_interface.run(host="127.0.0.1", port=port, debug=True)
+        web_interface.run(host="0.0.0.0", port=port, debug=True)
     except Exception as e:
         print(f"Error starting server: {e}")
         
@@ -30,6 +30,6 @@ if __name__ == "__main__":
         if port == 5000:
             try:
                 print("Trying alternative port 8080...")
-                web_interface.run(host="127.0.0.1", port=8080, debug=True)
+                web_interface.run(host="0.0.0.0", port=8080, debug=True)
             except Exception as e2:
                 print(f"Error starting server on alternative port: {e2}") 
