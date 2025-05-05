@@ -1,0 +1,238 @@
+{
+  "language": "ru",
+  "max_tokens": 1000,
+  "temperature": 0.7,
+  "knowledge_base_path": "./knowledge_base",
+  "supported_platforms": ["telegram", "website", "metaverse", "console"],
+  
+  "default_ai_model": "ani",
+  "current_ai_model": "ani",
+  "enabled_ai_models": [
+    "ani", 
+    "agi", 
+    "asi", 
+    "machine_learning", 
+    "deep_learning", 
+    "reinforcement_learning",
+    "analytical_ai",
+    "interactive_ai",
+    "functional_ai",
+    "symbolic_systems",
+    "connectionist_systems",
+    "hybrid_systems"
+  ],
+  
+  "enabled_db_connectors": [
+    "chat2db",
+    "bigquery",
+    "aurora",
+    "cosmosdb",
+    "snowflake",
+    "db2ai"
+  ],
+  
+  "ai_model_configs": {
+    "ani": {
+      "domain": "lucky_train"
+    },
+    "agi": {
+      "model": "gpt-3.5-turbo"
+    },
+    "asi": {
+      "model": "gpt-4o"
+    },
+    "machine_learning": {
+      "algorithm": "tfidf_similarity"
+    },
+    "deep_learning": {
+      "architecture": "transformer"
+    },
+    "reinforcement_learning": {
+      "algorithm": "q_learning"
+    },
+    "analytical_ai": {
+      "focus": "data_analysis"
+    },
+    "interactive_ai": {
+      "focus": "conversation"
+    },
+    "functional_ai": {
+      "focus": "task_automation"
+    },
+    "symbolic_systems": {
+      "reasoning_method": "rule_based"
+    },
+    "connectionist_systems": {
+      "reasoning_method": "neural_networks"
+    },
+    "hybrid_systems": {
+      "components": ["symbolic", "connectionist"]
+    }
+  },
+  
+  "db_connector_configs": {
+    "chat2db": {
+      "api_endpoint": ""
+    },
+    "bigquery": {
+      "project_id": ""
+    },
+    "aurora": {
+      "host": "",
+      "port": "3306",
+      "database": "lucky_train"
+    },
+    "cosmosdb": {
+      "endpoint": "",
+      "database_id": "lucky_train"
+    },
+    "snowflake": {
+      "account": "",
+      "warehouse": "compute_wh",
+      "database": "lucky_train"
+    },
+    "db2ai": {
+      "host": "",
+      "port": "50000",
+      "database": "lucky_train"
+    }
+  },
+  
+  "llm_settings": {
+    "llm_model": "gpt-3.5-turbo",
+    "system_prompt_template": "Ты - официальный AI-ассистент проекта Lucky Train на блокчейне TON. Твоя задача - предоставлять точную и полезную информацию о проекте, его токене, метавселенной и блокчейне TON. Отвечай на языке пользователя, будь профессиональным и дружелюбным. Используй только предоставленную информацию, не выдумывай факты.",
+    "embedding_model": "text-embedding-ada-002",
+    "fallback_to_tfidf": true,
+    "streaming": true
+  },
+  
+  "vector_db_settings": {
+    "db_type": "qdrant",
+    "collection_name": "lucky_train_kb",
+    "embedding_model": {
+      "type": "openai",
+      "name": "text-embedding-3-small"
+    },
+    "qdrant_path": "./qdrant_data",
+    "qdrant_url": "",
+    "qdrant_api_key": "",
+    "pinecone_api_key": "",
+    "pinecone_environment": "",
+    "pinecone_index": "lucky-train",
+    "weaviate_url": "",
+    "weaviate_api_key": "",
+    "api_key": ""
+  },
+  
+  "response_templates": {
+    "greeting": "Привет! Я AI-ассистент проекта Lucky Train. Чем я могу вам помочь?",
+    "not_understood": "Извините, я не нашел информации по вашему запросу. Пожалуйста, попробуйте сформулировать вопрос иначе или спросите о другом аспекте проекта Lucky Train.",
+    "farewell": "Спасибо за обращение! Если у вас возникнут еще вопросы, не стесняйтесь спрашивать."
+  },
+  
+  "telegram_settings": {
+    "welcome_message": "Привет! Я официальный AI-ассистент проекта Lucky Train на блокчейне TON. Я могу рассказать вам о проекте, токене LTT, метавселенной и многом другом.",
+    "commands": {
+      "start": "Начать общение с ботом",
+      "help": "Показать список доступных команд",
+      "about": "Информация о проекте Lucky Train",
+      "token": "Информация о токене LTT",
+      "metaverse": "Информация о метавселенной Lucky Train"
+    }
+  },
+  
+  "web_interface_settings": {
+    "title": "Lucky Train AI Assistant",
+    "theme": "light",
+    "welcome_message": "Привет! Я официальный AI-ассистент проекта Lucky Train. Чем я могу вам помочь?"
+  },
+  
+  "metaverse_settings": {
+    "avatar_model": "default_assistant",
+    "voice_enabled": true,
+    "welcome_message": "Приветствую в метавселенной Lucky Train! Я ваш виртуальный ассистент. Чем я могу помочь?",
+    "engine": "unity",
+    "server_endpoint": "wss://metaverse.luckytrain.io"
+  },
+  
+  "caching_settings": {
+    "backend": "memory",
+    "ttl_seconds": 3600,
+    "max_size": 1000
+  },
+  
+  "analytics_settings": {
+    "tracking_enabled": true,
+    "log_to_file": true,
+    "log_path": "./logs/analytics.log"
+  },
+  
+  "security_settings": {
+    "rate_limit": {
+      "enabled": true,
+      "max_requests_per_minute": 60
+    },
+    "input_validation": true,
+    "api_key_required": true
+  },
+  
+  "supported_languages": {
+    "ru": "Russian",
+    "en": "English",
+    "es": "Spanish",
+    "fr": "French",
+    "de": "German",
+    "zh": "Chinese",
+    "ja": "Japanese",
+    "ko": "Korean",
+    "ar": "Arabic",
+    "hi": "Hindi"
+  },
+  
+  "voice_models": {
+    "ru": "ru_male_1",
+    "en": "en_female_1",
+    "es": "es_male_1",
+    "fr": "fr_female_1",
+    "de": "de_male_1"
+  },
+  
+  "max_conversation_history": 20,
+  
+  "blockchain_settings": {
+    "network": "mainnet",
+    "rpc_endpoint": "https://toncenter.com/api/v2/jsonRPC",
+    "explorer_url": "https://tonscan.org"
+  },
+  
+  "multimodal_settings": {
+    "image_generation": {
+      "enabled": true,
+      "provider": "openai"
+    },
+    "text_to_speech": {
+      "enabled": true,
+      "provider": "elevenlabs"
+    },
+    "speech_to_text": {
+      "enabled": true,
+      "provider": "whisper"
+    }
+  },
+  
+  "data_source_settings": {
+    "kaggle": {
+      "enabled": true,
+      "api_key": ""
+    },
+    "google_dataset_search": {
+      "enabled": true
+    },
+    "uci_ml_repository": {
+      "enabled": true
+    },
+    "aws_public_datasets": {
+      "enabled": true
+    }
+  }
+} 

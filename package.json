@@ -1,0 +1,102 @@
+{
+  "name": "lucky-train-ai",
+  "version": "1.0.0",
+  "description": "Lucky Train AI Assistant - кроссплатформенное приложение для iOS, Android, MacOS, Windows и Linux",
+  "main": "src/desktop/main.js",
+  "author": "Lucky Train Team",
+  "license": "MIT",
+  "private": true,
+  "workspaces": [
+    "src/shared",
+    "src/mobile",
+    "src/desktop"
+  ],
+  "scripts": {
+    "start:mobile": "cd src/mobile && react-native start",
+    "ios": "cd src/mobile && react-native run-ios",
+    "android": "cd src/mobile && react-native run-android",
+    "start:desktop": "electron-forge start",
+    "package:macos": "electron-forge package --platform=darwin",
+    "package:windows": "electron-forge package --platform=win32",
+    "package:linux": "electron-forge package --platform=linux",
+    "make:macos": "electron-forge make --platform=darwin",
+    "make:windows": "electron-forge make --platform=win32",
+    "make:linux": "electron-forge make --platform=linux",
+    "build:all": "node build_all_platforms.js",
+    "build:tailwind": "tailwindcss -i ./src/tailwind.css -o ./src/web/static/css/tailwind.css && cp ./src/web/static/css/tailwind.css ./src/web/browser_extension/css/tailwind.css",
+    "lint": "eslint .",
+    "test": "jest"
+  },
+  "dependencies": {
+    "axios": "^1.5.0",
+    "electron-squirrel-startup": "^1.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-redux": "^8.1.2",
+    "@reduxjs/toolkit": "^1.9.5",
+    "zustand": "^4.4.1",
+    "tailwindcss": "^3.3.3",
+    "postcss": "^8.4.31",
+    "autoprefixer": "^10.4.16"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.22.15",
+    "@babel/preset-env": "^7.22.15",
+    "@babel/preset-react": "^7.22.15",
+    "@babel/preset-typescript": "^7.22.15",
+    "@electron-forge/cli": "^6.4.1",
+    "@electron-forge/maker-deb": "^6.4.1",
+    "@electron-forge/maker-rpm": "^6.4.1",
+    "@electron-forge/maker-squirrel": "^6.4.1",
+    "@electron-forge/maker-zip": "^6.4.1",
+    "@electron-forge/maker-dmg": "^6.4.1",
+    "@types/jest": "^29.5.4",
+    "@types/node": "^20.5.9",
+    "@types/react": "^18.2.21",
+    "@types/react-dom": "^18.2.7",
+    "@typescript-eslint/eslint-plugin": "^6.5.0",
+    "@typescript-eslint/parser": "^6.5.0",
+    "electron": "^26.2.0",
+    "eslint": "^8.48.0",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "jest": "^29.6.4",
+    "typescript": "^5.2.2"
+  },
+  "config": {
+    "forge": {
+      "packagerConfig": {
+        "asar": true,
+        "icon": "src/shared/assets/icons/icon"
+      },
+      "makers": [
+        {
+          "name": "@electron-forge/maker-squirrel",
+          "config": {
+            "name": "LuckyTrainAI"
+          }
+        },
+        {
+          "name": "@electron-forge/maker-zip",
+          "platforms": [
+            "darwin"
+          ]
+        },
+        {
+          "name": "@electron-forge/maker-dmg",
+          "config": {
+            "format": "ULFO"
+          }
+        },
+        {
+          "name": "@electron-forge/maker-deb",
+          "config": {}
+        },
+        {
+          "name": "@electron-forge/maker-rpm",
+          "config": {}
+        }
+      ]
+    }
+  }
+} 

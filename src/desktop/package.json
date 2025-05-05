@@ -1,0 +1,47 @@
+{
+  "name": "lucky-train-ai-desktop",
+  "version": "1.0.0",
+  "description": "Lucky Train AI Assistant для десктопных платформ (MacOS, Windows, Linux)",
+  "private": true,
+  "main": "main.js",
+  "scripts": {
+    "start": "electron-forge start",
+    "package": "electron-forge package",
+    "make": "electron-forge make",
+    "publish": "electron-forge publish",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "electron-squirrel-startup": "^1.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "@mui/material": "^5.14.10",
+    "@mui/icons-material": "^5.14.9",
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "axios": "^1.5.0",
+    "react-redux": "^8.1.2",
+    "@reduxjs/toolkit": "^1.9.5",
+    "zustand": "^4.4.1",
+    "electron-store": "^8.1.0"
+  },
+  "devDependencies": {
+    "@electron-forge/cli": "^6.4.1",
+    "@electron-forge/maker-deb": "^6.4.1",
+    "@electron-forge/maker-rpm": "^6.4.1",
+    "@electron-forge/maker-squirrel": "^6.4.1",
+    "@electron-forge/maker-zip": "^6.4.1",
+    "@electron-forge/maker-dmg": "^6.4.1",
+    "@types/react": "^18.2.21",
+    "@types/react-dom": "^18.2.7",
+    "electron": "^26.2.0",
+    "electron-rebuild": "^3.2.13",
+    "typescript": "^5.2.2",
+    "eslint": "^8.48.0",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0"
+  },
+  "engines": {
+    "node": ">=16"
+  }
+} 

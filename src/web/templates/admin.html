@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Lucky Train AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}">
+</head>
+<body class="theme-{{ theme }}">
+    <div class="admin-container">
+        <aside class="admin-sidebar">
+            <div class="admin-logo">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Lucky Train Logo">
+                <h1>Admin Panel</h1>
+            </div>
+            <nav class="admin-nav">
+                <ul>
+                    <li><a href="#dashboard" class="nav-link active" data-section="dashboard">Dashboard</a></li>
+                    <li><a href="#analytics" class="nav-link" data-section="analytics">Analytics</a></li>
+                    <li><a href="#users" class="nav-link" data-section="users">Users</a></li>
+                    <li><a href="#settings" class="nav-link" data-section="settings">Settings</a></li>
+                    <li><a href="#api-keys" class="nav-link" data-section="api-keys">API Keys</a></li>
+                    <li><a href="#knowledge" class="nav-link" data-section="knowledge">Knowledge Base</a></li>
+                    <li><a href="#logs" class="nav-link" data-section="logs">Logs</a></li>
+                </ul>
+            </nav>
+            <div class="admin-logout">
+                <a href="/admin/logout" class="logout-button">Logout</a>
+            </div>
+        </aside>
+        
+        <main class="admin-content">
+            <header class="admin-header">
+                <div class="admin-search">
+                    <input type="text" placeholder="Search...">
+                    <button type="submit" aria-label="Search">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    </button>
+                </div>
+                <div class="admin-user">
+                    <span>{{ admin_name }}</span>
+                    <img src="{{ url_for('static', filename='images/admin-avatar.png') }}" alt="Admin Avatar">
+                </div>
+            </header>
+            
+            <div class="admin-sections">
+                <!-- Dashboard Section -->
+                <section id="dashboard" class="admin-section active">
+                    <h2>Dashboard</h2>
+                    <div class="dashboard-stats">
+                        <!-- Stats cards will be here -->
+                    </div>
+                    <div class="dashboard-charts">
+                        <!-- Charts will be here -->
+                    </div>
+                </section>
+                
+                <!-- Other sections hidden initially -->
+                <section id="analytics" class="admin-section">
+                    <h2>Analytics</h2>
+                    <!-- Analytics content -->
+                </section>
+                
+                <section id="users" class="admin-section">
+                    <h2>Users Management</h2>
+                    <!-- Users content -->
+                </section>
+                
+                <section id="settings" class="admin-section">
+                    <h2>System Settings</h2>
+                    <!-- Settings content -->
+                </section>
+                
+                <section id="api-keys" class="admin-section">
+                    <h2>API Keys Management</h2>
+                    <!-- API keys content -->
+                </section>
+                
+                <section id="knowledge" class="admin-section">
+                    <h2>Knowledge Base</h2>
+                    <!-- Knowledge base content -->
+                </section>
+                
+                <section id="logs" class="admin-section">
+                    <h2>System Logs</h2>
+                    <!-- Logs content -->
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+</body>
+</html> 

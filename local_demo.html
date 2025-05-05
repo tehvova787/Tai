@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lucky Train AI - Локальная демо</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .chat-container {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+        .chat-header {
+            background-color: #0066cc;
+            color: white;
+            padding: 10px 15px;
+        }
+        .chat-messages {
+            height: 300px;
+            padding: 15px;
+            overflow-y: auto;
+            background-color: #f9f9f9;
+        }
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+        }
+        .message.user {
+            justify-content: flex-end;
+        }
+        .message-content {
+            padding: 10px 15px;
+            border-radius: 15px;
+            max-width: 70%;
+        }
+        .user .message-content {
+            background-color: #0084ff;
+            color: white;
+        }
+        .assistant .message-content {
+            background-color: #e5e5ea;
+        }
+        .chat-input {
+            display: flex;
+            padding: 10px;
+            background-color: #fff;
+            border-top: 1px solid #ddd;
+        }
+        .chat-input input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            outline: none;
+        }
+        .chat-input button {
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 10px 15px;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+        .about-section {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Lucky Train AI Assistant</h1>
+    <p>Локальная демо-версия веб-интерфейса LuckyTrain AI Assistant.</p>
+    
+    <div class="chat-container">
+        <div class="chat-header">
+            <h2>Чат с AI-ассистентом</h2>
+        </div>
+        <div class="chat-messages" id="chat-messages">
+            <div class="message assistant">
+                <div class="message-content">
+                    <p>Привет! Я AI-ассистент проекта Lucky Train на блокчейне TON. Чем я могу вам помочь?</p>
+                </div>
+            </div>
+        </div>
+        <div class="chat-input">
+            <input type="text" id="message-input" placeholder="Введите ваш вопрос...">
+            <button id="send-button">Отправить</button>
+        </div>
+    </div>
+    
+    <div class="about-section">
+        <h3>О проекте Lucky Train</h3>
+        <p>Lucky Train - это инновационный проект на блокчейне TON, создающий собственную метавселенную и экосистему с уникальной экономической моделью. Проект объединяет игровые механики, NFT и децентрализованные финансы в единую экосистему.</p>
+        
+        <h3>Особенности проекта:</h3>
+        <ul>
+            <li><strong>Токен LTT</strong> - основная валюта экосистемы с дефляционной моделью</li>
+            <li><strong>Метавселенная</strong> - виртуальный мир с собственной экономикой</li>
+            <li><strong>Блокчейн TON</strong> - высокая скорость транзакций и низкие комиссии</li>
+        </ul>
+    </div>
+
+    <script>
+        // Простая демонстрация без серверного взаимодействия
+        document.addEventListener('DOMContentLoaded', function() {
+            const messageInput = document.getElementById('message-input');
+            const sendButton = document.getElementById('send-button');
+            const chatMessages = document.getElementById('chat-messages');
+            
+            function addMessage(text, isUser) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = isUser ? 'message user' : 'message assistant';
+                
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'message-content';
+                
+                const paragraph = document.createElement('p');
+                paragraph.textContent = text;
+                
+                contentDiv.appendChild(paragraph);
+                messageDiv.appendChild(contentDiv);
+                chatMessages.appendChild(messageDiv);
+                
+                // Прокрутка вниз
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+            
+            function generateResponse(message) {
+                const messageLower = message.toLowerCase();
+                
+                if (messageLower.includes('привет') || messageLower.includes('здравствуй')) {
+                    return "Привет! Рад видеть вас в демо-версии LuckyTrainAI. Как я могу помочь?";
+                }
+                
+                if (messageLower.includes('блокчейн') || messageLower.includes('ton')) {
+                    return "LuckyTrain использует блокчейн TON (The Open Network) для своей экосистемы. TON обеспечивает высокую скорость транзакций и низкие комиссии, что делает его идеальным для игровых и метавселенных проектов.";
+                }
+                
+                if (messageLower.includes('метавселенн')) {
+                    return "Метавселенная LuckyTrain - это виртуальный мир с элементами игры, где пользователи могут взаимодействовать, строить и участвовать в экономической системе. Экономика метавселенной основана на токене LTT, который можно использовать внутри экосистемы для различных целей.";
+                }
+                
+                if (messageLower.includes('токен') || messageLower.includes('ltt')) {
+                    return "Токен LTT (Lucky Train Token) - это основная валюта экосистемы LuckyTrain. Он имеет дефляционную модель и используется для транзакций внутри метавселенной, стейкинга и участия в управлении проектом.";
+                }
+                
+                if (messageLower.includes('карт')) {
+                    return "Дорожная карта проекта Lucky Train включает в себя несколько фаз: разработку базовой экосистемы, запуск токена LTT, создание метавселенной и интеграцию с другими блокчейн-проектами. Каждая фаза содержит множество задач, направленных на развитие проекта.";
+                }
+                
+                if (messageLower.includes('команд')) {
+                    return "Команда LuckyTrain состоит из опытных разработчиков, дизайнеров и блокчейн-экспертов. Все участники команды имеют большой опыт в создании цифровых продуктов и работе с блокчейн-технологиями.";
+                }
+                
+                // Ответ по умолчанию
+                return "Как демо-версия, я могу рассказать о проекте LuckyTrain, его токене, метавселенной и блокчейне TON. Спросите меня об этих темах, чтобы узнать больше.";
+            }
+            
+            function handleSend() {
+                const message = messageInput.value.trim();
+                if (message) {
+                    // Добавляем сообщение пользователя
+                    addMessage(message, true);
+                    
+                    // Очищаем поле ввода
+                    messageInput.value = '';
+                    
+                    // Имитация задержки перед ответом
+                    setTimeout(() => {
+                        // Генерируем ответ
+                        const response = generateResponse(message);
+                        addMessage(response, false);
+                    }, 500);
+                }
+            }
+            
+            // Обработчики событий
+            sendButton.addEventListener('click', handleSend);
+            messageInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    handleSend();
+                    e.preventDefault();
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}">
+</head>
+<body class="theme-{{ theme }}">
+    <div class="main-container">
+        <header class="header">
+            <div class="header-logo">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Lucky Train Logo" class="logo">
+                <h1>Lucky Train AI Assistant</h1>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="/" class="nav-link">Главная</a></li>
+                    <li><a href="/chat" class="nav-link">Чат</a></li>
+                    <li><a href="/docs" class="nav-link active">Документация</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main class="content docs-content">
+            <div class="docs-container">
+                <div class="docs-sidebar">
+                    <h3>Разделы</h3>
+                    <ul>
+                        <li><a href="#overview" class="sidebar-link active">Обзор</a></li>
+                        <li><a href="#getting-started" class="sidebar-link">Начало работы</a></li>
+                        <li><a href="#features" class="sidebar-link">Возможности</a></li>
+                        <li><a href="#browser-extension" class="sidebar-link">Расширение для браузера</a></li>
+                        <li><a href="#api" class="sidebar-link">API</a></li>
+                        <li><a href="#faq" class="sidebar-link">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="docs-main">
+                    <section id="overview" class="docs-section">
+                        <h2>Обзор Lucky Train AI Assistant</h2>
+                        <p>
+                            Lucky Train AI Assistant - это интеллектуальный помощник, работающий на базе современных технологий искусственного интеллекта.
+                            Он разработан для предоставления информации о проекте Lucky Train, его токене, метавселенной и блокчейне TON.
+                        </p>
+                        <p>
+                            Ассистент доступен в нескольких форматах:
+                        </p>
+                        <ul>
+                            <li>Веб-версия (которую вы используете сейчас)</li>
+                            <li>Расширение для браузера</li>
+                            <li>Мобильное приложение для iOS и Android</li>
+                            <li>Десктопное приложение для Windows, MacOS и Linux</li>
+                        </ul>
+                    </section>
+
+                    <section id="getting-started" class="docs-section">
+                        <h2>Начало работы</h2>
+                        <p>
+                            Использовать Lucky Train AI Assistant очень просто:
+                        </p>
+                        <ol>
+                            <li>Откройте интерфейс чата</li>
+                            <li>Введите свой вопрос в поле ввода</li>
+                            <li>Нажмите кнопку отправки или клавишу Enter</li>
+                            <li>Получите ответ от ассистента</li>
+                        </ol>
+                        <p>
+                            Вы можете задавать вопросы на русском или английском языке. Ассистент автоматически определит язык и ответит соответственно.
+                        </p>
+                    </section>
+
+                    <section id="features" class="docs-section">
+                        <h2>Возможности</h2>
+                        <h3>Основные возможности:</h3>
+                        <ul>
+                            <li>Предоставление информации о проекте Lucky Train</li>
+                            <li>Информация о токене LTT и его применении</li>
+                            <li>Данные о блокчейне TON и его особенностях</li>
+                            <li>Описание метавселенной Lucky Train</li>
+                            <li>Ответы на часто задаваемые вопросы</li>
+                            <li>Помощь с использованием платформы</li>
+                        </ul>
+                        <h3>Технические возможности:</h3>
+                        <ul>
+                            <li>Поддержка русского и английского языков</li>
+                            <li>Потоковые ответы (мгновенный вывод по мере генерации)</li>
+                            <li>Сохранение истории диалогов</li>
+                            <li>Интеграция с блокчейном TON</li>
+                            <li>Возможность выбора темы интерфейса (светлая/темная)</li>
+                        </ul>
+                    </section>
+
+                    <section id="browser-extension" class="docs-section">
+                        <h2>Расширение для браузера</h2>
+                        <p>
+                            Lucky Train AI Assistant доступен в виде расширения для популярных браузеров:
+                        </p>
+                        <div class="browser-downloads">
+                            <a href="#" class="browser-download">
+                                <img src="{{ url_for('static', filename='images/chrome.png') }}" alt="Google Chrome">
+                                <span>Google Chrome</span>
+                            </a>
+                            <a href="#" class="browser-download">
+                                <img src="{{ url_for('static', filename='images/firefox.png') }}" alt="Mozilla Firefox">
+                                <span>Mozilla Firefox</span>
+                            </a>
+                            <a href="#" class="browser-download">
+                                <img src="{{ url_for('static', filename='images/edge.png') }}" alt="Microsoft Edge">
+                                <span>Microsoft Edge</span>
+                            </a>
+                        </div>
+                        <h3>Установка расширения:</h3>
+                        <ol>
+                            <li>Нажмите на ссылку для вашего браузера выше</li>
+                            <li>Нажмите "Установить" или "Добавить в браузер"</li>
+                            <li>Подтвердите установку</li>
+                            <li>После установки значок Lucky Train появится в панели расширений</li>
+                        </ol>
+                        <h3>Использование расширения:</h3>
+                        <ol>
+                            <li>Нажмите на значок расширения в панели браузера</li>
+                            <li>Введите свой вопрос в появившемся окне</li>
+                            <li>Получите ответ прямо в окне расширения</li>
+                        </ol>
+                    </section>
+
+                    <section id="api" class="docs-section">
+                        <h2>API</h2>
+                        <p>
+                            Lucky Train AI Assistant предоставляет API для интеграции с вашими проектами.
+                            Для использования API вам потребуется API-ключ, который можно получить у администратора.
+                        </p>
+                        <h3>Основные эндпоинты:</h3>
+                        <div class="api-endpoint">
+                            <h4>POST /api/chat</h4>
+                            <p>Получение ответа от ассистента</p>
+                            <pre><code>{
+  "message": "Ваш вопрос",
+  "session_id": "опционально - ID сессии",
+  "user_id": "опционально - ID пользователя"
+}</code></pre>
+                        </div>
+                        <div class="api-endpoint">
+                            <h4>POST /api/stream-chat</h4>
+                            <p>Получение потокового ответа от ассистента</p>
+                            <pre><code>{
+  "message": "Ваш вопрос",
+  "session_id": "опционально - ID сессии",
+  "user_id": "опционально - ID пользователя"
+}</code></pre>
+                        </div>
+                        <p>
+                            Для более подробной документации по API обратитесь к администратору проекта.
+                        </p>
+                    </section>
+
+                    <section id="faq" class="docs-section">
+                        <h2>Часто задаваемые вопросы</h2>
+                        <div class="faq-item">
+                            <h3>Что такое Lucky Train?</h3>
+                            <p>
+                                Lucky Train - это инновационный проект на блокчейне TON, создающий собственную метавселенную и экосистему с уникальной экономической моделью.
+                            </p>
+                        </div>
+                        <div class="faq-item">
+                            <h3>Что такое токен LTT?</h3>
+                            <p>
+                                LTT (Lucky Train Token) - основной токен экосистемы Lucky Train, который используется для различных операций внутри платформы.
+                            </p>
+                        </div>
+                        <div class="faq-item">
+                            <h3>Как использовать AI-ассистента?</h3>
+                            <p>
+                                Просто задайте свой вопрос в поле ввода и получите ответ от ассистента. Вы можете спрашивать о проекте, токене, метавселенной и блокчейне TON.
+                            </p>
+                        </div>
+                        <div class="faq-item">
+                            <h3>На каких языках говорит ассистент?</h3>
+                            <p>
+                                Ассистент поддерживает русский и английский языки. Он автоматически определяет язык вашего запроса и отвечает на том же языке.
+                            </p>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <div class="footer-links">
+                <a href="https://t.me/luckytrain" target="_blank" rel="noopener noreferrer">Telegram</a>
+                <a href="https://twitter.com/luckytrain" target="_blank" rel="noopener noreferrer">Twitter</a>
+                <a href="https://discord.gg/luckytrain" target="_blank" rel="noopener noreferrer">Discord</a>
+                <a href="https://luckytrain.io" target="_blank" rel="noopener noreferrer">Website</a>
+            </div>
+            <div class="footer-copyright">
+                &copy; 2023 Lucky Train. Все права защищены.
+            </div>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/docs.js') }}"></script>
+</body>
+</html> 

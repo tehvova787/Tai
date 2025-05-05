@@ -1,0 +1,208 @@
+#!/usr/bin/env python3
+"""
+Lucky Train AI - Main Entry Point
+
+This module serves as the main entry point for the Lucky Train AI system,
+using the unified system architecture.
+"""
+
+import os
+import sys
+import logging
+import argparse
+import signal
+from typing import List, Optional
+
+# Import the unified system
+from unified_system_integrator import create_unified_system
+
+# Configure basic logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger("main")
+
+def parse_arguments():
+    """Parse command line arguments."""
+    parser = argparse.ArgumentParser(description="Lucky Train AI System")
+    
+    # Configuration options
+    parser.add_argument('--config', type=str, help='Path to configuration file')
+    parser.add_argument('--log-level', choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
+                      default='INFO', help='Logging level')
+    
+    # Component selection
+    parser.add_argument('--components', type=str, 
+                      help='Comma-separated list of components to start (e.g., web_interface,telegram_bot)')
+    
+    # Run modes
+    parser.add_argument('--console', action='store_true', help='Run in console mode')
+    parser.add_argument('--web', action='store_true', help='Run web interface')
+    parser.add_argument('--bot', action='store_true', help='Run Telegram bot')
+    parser.add_argument('--all', action='store_true', help='Run all components')
+    
+    # Web interface options
+    parser.add_argument('--host', type=str, default='0.0.0.0', help='Web interface host')
+    parser.add_argument('--port', type=int, default=5000, help='Web interface port')
+    
+    # Advanced options
+    parser.add_argument('--demo', action='store_true', help='Run in demo mode')
+    parser.add_argument('--security-level', choices=['standard', 'enhanced'], 
+                      default='standard', help='Security level')
+    
+    return parser.parse_args()
+
+def setup_signal_handlers(unified_system):
+    """Setup signal handlers for graceful shutdown."""
+    def signal_handler(sig, frame):
+        logger.info(f"Received signal {sig}, shutting down...")
+        if unified_system:
+            unified_system.shutdown()
+        sys.exit(0)
+    
+    # Register signal handlers
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
+
+def get_components_to_start(args) -> List[str]:
+    """Determine which components to start based on command line arguments."""
+    components = []
+    
+    # If --components is specified, use those
+    if args.components:
+        return args.components.split(',')
+    
+    # Otherwise, determine from individual flags
+    if args.web or args.all:
+        components.append('web_interface')
+    
+    if args.bot or args.all:
+        components.append('telegram_bot')
+    
+    if args.all:
+        # Start all core services
+        components.extend([
+            'api_gateway',
+            'assistant_core',
+            'knowledge_base',
+            'ai_model',
+            'blockchain',
+            'user_management',
+            'metaverse',
+            'multimodal'
+        ])
+    
+    # If no components specified and not in console mode, default to web interface
+    if not components and not args.console:
+        components.append('web_interface')
+    
+    return components
+
+def main():
+    """Main entry point."""
+    # Parse command line arguments
+    args = parse_arguments()
+    
+    # Set log level
+    log_level = getattr(logging, args.log_level)
+    logging.getLogger().setLevel(log_level)
+    
+    try:
+        # Create the unified system
+        logger.info("Initializing Lucky Train AI unified system...")
+        unified_system = create_unified_system(args.config)
+        
+        # Setup signal handlers
+        setup_signal_handlers(unified_system)
+        
+        # Determine which components to start
+        components_to_start = get_components_to_start(args)
+        
+        if components_to_start:
+            # Start the specified components
+            logger.info(f"Starting components: {', '.join(components_to_start)}")
+            unified_system.start_services(components_to_start)
+            
+            # If running in console mode, start an interactive console
+            if args.console:
+                run_interactive_console(unified_system)
+            else:
+                # Keep the main thread running
+                print(f"Lucky Train AI system running with components: {', '.join(components_to_start)}")
+                print("Press Ctrl+C to exit.")
+                
+                # Wait for KeyboardInterrupt
+                while True:
+                    # Sleep to avoid CPU usage
+                    import time
+                    time.sleep(1)
+        else:
+            # Just run in console mode
+            run_interactive_console(unified_system)
+    
+    except Exception as e:
+        logger.error(f"Error in main: {e}")
+        import traceback
+        traceback.print_exc()
+        return 1
+    
+    return 0
+
+def run_interactive_console(unified_system):
+    """Run an interactive console."""
+    print("Lucky Train AI - Interactive Console")
+    print("Type 'exit' to quit")
+    print("Type 'help' for assistance")
+    
+    while True:
+        try:
+            # Get user input
+            user_input = input("> ")
+            
+            # Check for exit command
+            if user_input.lower() in ('exit', 'quit'):
+                break
+            
+            # Check for help command
+            if user_input.lower() == 'help':
+                print_help()
+                continue
+            
+            # Process the input
+            response = unified_system.handle_request({
+                "message": user_input,
+                "user_id": "console_user",
+                "platform": "console"
+            })
+            
+            # Print the response
+            if isinstance(response, dict):
+                print(response.get("response", "No response"))
+            else:
+                print(response)
+        
+        except KeyboardInterrupt:
+            print("\nExiting...")
+            break
+        except Exception as e:
+            print(f"Error: {e}")
+    
+    # Shutdown the system
+    unified_system.shutdown()
+
+def print_help():
+    """Print help information."""
+    print("\nLucky Train AI - Help")
+    print("---------------------")
+    print("Commands:")
+    print("  exit, quit - Exit the console")
+    print("  help       - Show this help information")
+    print("\nExamples:")
+    print("  What is Lucky Train?")
+    print("  Tell me about TON blockchain")
+    print("  How can I buy an NFT in the metaverse?")
+    print()
+
+if __name__ == "__main__":
+    sys.exit(main()) 

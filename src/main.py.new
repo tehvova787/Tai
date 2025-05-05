@@ -1,0 +1,147 @@
+"""
+Main Entry Point for Lucky Train AI Assistant
+
+This module initializes and starts the AI assistant with all improvements.
+"""
+
+import os
+import sys
+import logging
+import argparse
+import signal
+from typing import Dict, List, Any, Optional
+
+# Import improved system initialization
+from improved_system_init import init_system, get_system
+
+# Configure basic logging until enhanced logging is set up
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+def parse_arguments():
+    """Parse command line arguments."""
+    parser = argparse.ArgumentParser(description='Lucky Train AI Assistant')
+    
+    # General options
+    parser.add_argument('--config', type=str, help='Path to configuration file')
+    parser.add_argument('--verbose', '-v', action='store_true', help='Enable verbose logging')
+    parser.add_argument('--debug', '-d', action='store_true', help='Enable debug mode')
+    
+    # Web interface options
+    parser.add_argument('--web', action='store_true', help='Start web interface')
+    parser.add_argument('--port', type=int, default=5000, help='Web interface port')
+    parser.add_argument('--host', type=str, default='0.0.0.0', help='Web interface host')
+    
+    # Bot options
+    parser.add_argument('--bot', action='store_true', help='Start telegram bot')
+    
+    # Demo options
+    parser.add_argument('--demo', action='store_true', help='Run in demo mode')
+    
+    return parser.parse_args()
+
+def setup_signal_handlers(system):
+    """Set up signal handlers for graceful shutdown."""
+    def signal_handler(sig, frame):
+        logger.info(f"Received signal {sig}, shutting down...")
+        if system:
+            system.shutdown()
+        sys.exit(0)
+    
+    # Register signal handlers
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
+
+def run_web_interface(system, host='0.0.0.0', port=5000):
+    """Run the web interface."""
+    try:
+        # Import web interface module
+        from web_interface import start_web_interface
+        
+        # Start web interface
+        start_web_interface(system, host, port)
+    except ImportError:
+        logger.error("Web interface module not found")
+        sys.exit(1)
+    except Exception as e:
+        logger.error(f"Error starting web interface: {e}")
+        sys.exit(1)
+
+def run_telegram_bot(system):
+    """Run the Telegram bot."""
+    try:
+        # Import bot module
+        from bot.telegram_bot import start_bot
+        
+        # Start bot
+        start_bot(system)
+    except ImportError:
+        logger.error("Telegram bot module not found")
+        sys.exit(1)
+    except Exception as e:
+        logger.error(f"Error starting Telegram bot: {e}")
+        sys.exit(1)
+
+def run_demo_mode(system):
+    """Run in demo mode."""
+    try:
+        # Import demo module
+        from system_demo import run_demo
+        
+        # Start demo
+        run_demo(system)
+    except ImportError:
+        logger.error("Demo module not found")
+        sys.exit(1)
+    except Exception as e:
+        logger.error(f"Error running demo: {e}")
+        sys.exit(1)
+
+def main():
+    """Main entry point."""
+    # Parse arguments
+    args = parse_arguments()
+    
+    # Set log level based on arguments
+    log_level = logging.DEBUG if args.debug else (logging.INFO if args.verbose else logging.WARNING)
+    logging.getLogger().setLevel(log_level)
+    
+    # Get configuration path
+    config_path = args.config
+    
+    try:
+        # Initialize the system with improvements
+        logger.info("Initializing Lucky Train AI system with improvements...")
+        system = init_system(config_path)
+        
+        # Setup signal handlers
+        setup_signal_handlers(system)
+        
+        # Determine what to run based on arguments
+        if args.web:
+            run_web_interface(system, args.host, args.port)
+        elif args.bot:
+            run_telegram_bot(system)
+        elif args.demo:
+            run_demo_mode(system)
+        else:
+            logger.info("No run mode specified, starting interactive console...")
+            # Import and run interactive console
+            try:
+                from console_interface import run_console
+                run_console(system)
+            except ImportError:
+                logger.error("Console interface not found, please specify a run mode (--web, --bot, --demo)")
+                sys.exit(1)
+    
+    except Exception as e:
+        logger.error(f"Error initializing system: {e}")
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)
+
+if __name__ == "__main__":
+    main() 

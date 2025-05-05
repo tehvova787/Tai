@@ -1,0 +1,20 @@
+/* Tailwind CSS */
+/* This file will be overwritten when building with the tailwind CLI */
+
+/* Basic utilities to replace Tailwind until properly built */
+.flex { display: flex; }
+.items-center { align-items: center; }
+.justify-center { justify-content: center; }
+.text-center { text-align: center; }
+.font-bold { font-weight: bold; }
+.text-lg { font-size: 1.125rem; }
+.text-xl { font-size: 1.25rem; }
+.m-2 { margin: 0.5rem; }
+.p-2 { padding: 0.5rem; }
+.rounded { border-radius: 0.25rem; }
+.bg-blue-500 { background-color: #3b82f6; }
+.text-white { color: white; }
+.grid { display: grid; }
+.gap-4 { gap: 1rem; }
+.w-full { width: 100%; }
+.h-full { height: 100%; } 

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}">
+</head>
+<body class="theme-{{ theme }}">
+    <div class="main-container">
+        <header class="header">
+            <div class="header-logo">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Lucky Train Logo" class="logo">
+                <h1>Lucky Train AI Assistant</h1>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="/" class="nav-link">Главная</a></li>
+                    <li><a href="/chat" class="nav-link active">Чат</a></li>
+                    <li><a href="/docs" class="nav-link">Документация</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main class="content">
+            <div class="full-chat-container">
+                <div class="chat-header">
+                    <h2>Чат с AI-ассистентом</h2>
+                    <div class="chat-controls">
+                        <button id="clear-chat-btn" title="Очистить чат">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                        </button>
+                        <button id="theme-toggle-btn" title="Сменить тему">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="chat-messages" id="chat-messages">
+                    <div class="message assistant">
+                        <div class="message-avatar">
+                            <img src="{{ url_for('static', filename='images/assistant-avatar.png') }}" alt="Assistant">
+                        </div>
+                        <div class="message-content">
+                            <p>{{ welcome_message }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="chat-input">
+                    <form id="chat-form">
+                        <textarea id="message-input" placeholder="Введите ваш вопрос..." rows="1" autocomplete="off"></textarea>
+                        <button type="submit" id="send-button" aria-label="Отправить сообщение">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <div class="footer-links">
+                <a href="https://t.me/luckytrain" target="_blank" rel="noopener noreferrer">Telegram</a>
+                <a href="https://twitter.com/luckytrain" target="_blank" rel="noopener noreferrer">Twitter</a>
+                <a href="https://discord.gg/luckytrain" target="_blank" rel="noopener noreferrer">Discord</a>
+                <a href="https://luckytrain.io" target="_blank" rel="noopener noreferrer">Website</a>
+            </div>
+            <div class="footer-copyright">
+                &copy; 2023 Lucky Train. Все права защищены.
+            </div>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+</body>
+</html> 

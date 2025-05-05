@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LuckyTrainAI - Простий інтерфейс</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Orbitron:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/luckytrain-futuristic.css') }}">
+</head>
+<body>
+    <div class="cyber-background">
+        <div class="aurora"></div>
+    </div>
+    
+    <div class="chat-container hologram" style="max-width: 1200px; margin: 2rem auto; padding: 2rem;">
+        <header style="margin-bottom: 4rem; position: relative;">
+            <div class="train-logo"></div>
+            <h1 class="neon-text" data-text="LuckyTrainAI" style="text-align: center; font-size: 4rem; margin-bottom: 1rem;">LuckyTrainAI</h1>
+            <p class="neon-text" data-text="Простий інтерфейс" style="text-align: center; font-size: 1.8rem;">Простий інтерфейс</p>
+            <div class="electric-discharge"></div>
+        </header>
+
+        <div class="features-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 3rem; margin-bottom: 4rem;">
+            <div class="feature-card hologram" style="padding: 2rem; text-align: center;">
+                <h2 class="neon-text" data-text="Тестова сторінка" style="font-size: 2rem; margin-bottom: 1rem;">Тестова сторінка</h2>
+                <a href="/test" class="cyber-button" style="text-decoration: none; display: inline-block; margin-top: 1rem;">Перейти</a>
+            </div>
+            
+            <div class="feature-card hologram" style="padding: 2rem; text-align: center;">
+                <h2 class="neon-text" data-text="Чат LuckyTrainAI" style="font-size: 2rem; margin-bottom: 1rem;">Чат LuckyTrainAI</h2>
+                <a href="/luckytrainai-chat" class="cyber-button" style="text-decoration: none; display: inline-block; margin-top: 1rem;">Перейти</a>
+            </div>
+            
+            <div class="feature-card hologram" style="padding: 2rem; text-align: center;">
+                <h2 class="neon-text" data-text="Інтерфейс LuckyTrainAI" style="font-size: 2rem; margin-bottom: 1rem;">Інтерфейс LuckyTrainAI</h2>
+                <a href="/luckytrainai" class="cyber-button" style="text-decoration: none; display: inline-block; margin-top: 1rem;">Перейти</a>
+            </div>
+        </div>
+
+        <div class="hologram" style="padding: 2rem; margin-bottom: 4rem; text-align: center;">
+            <h2 class="neon-text" data-text="Про проект Lucky Train" style="font-size: 2.5rem; margin-bottom: 2rem;">Про проект Lucky Train</h2>
+            <p style="color: var(--color-white); font-size: 1.2rem; line-height: 1.6; max-width: 800px; margin: 0 auto;">
+                Lucky Train - це інноваційний проект на блокчейні TON, що створює власну метавселенну та екосистему з унікальною економічною моделлю.
+            </p>
+            <div class="rainbow-trail"></div>
+        </div>
+
+        <div style="text-align: center; margin-bottom: 4rem;">
+            <a href="/" class="cyber-button" style="font-size: 1.5rem; padding: 1.5rem 3rem; text-decoration: none; display: inline-block;">На головну</a>
+        </div>
+
+        <footer style="text-align: center; padding-top: 2rem; border-top: 1px solid var(--color-turquoise);">
+            <div class="social-links" style="margin-bottom: 1.5rem;">
+                <a href="https://t.me/luckytrain" target="_blank" class="cyber-button" style="text-decoration: none; margin: 0 0.5rem;">Telegram</a>
+                <a href="https://twitter.com/luckytrain" target="_blank" class="cyber-button" style="text-decoration: none; margin: 0 0.5rem;">Twitter</a>
+                <a href="https://discord.gg/luckytrain" target="_blank" class="cyber-button" style="text-decoration: none; margin: 0 0.5rem;">Discord</a>
+            </div>
+            <p class="neon-text" data-text="© 2025 LuckyTrainAI" style="font-size: 1.2rem;">© 2025 LuckyTrainAI</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Create particles
+            createParticles();
+
+            function createParticles() {
+                const background = document.querySelector('.cyber-background');
+                for (let i = 0; i < 50; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    particle.style.width = Math.random() * 4 + 2 + 'px';
+                    particle.style.height = particle.style.width;
+                    particle.style.left = Math.random() * 100 + '%';
+                    particle.style.top = Math.random() * 100 + '%';
+                    particle.style.animationDuration = Math.random() * 10 + 5 + 's';
+                    particle.style.animationDelay = Math.random() * 5 + 's';
+                    background.appendChild(particle);
+                }
+            }
+
+            // Add hover effects to feature cards
+            const featureCards = document.querySelectorAll('.feature-card');
+            featureCards.forEach(card => {
+                card.addEventListener('mouseover', function() {
+                    this.style.transform = 'translateY(-5px)';
+                    this.style.boxShadow = '0 0 20px var(--color-turquoise), 0 0 40px var(--color-purple)';
+                });
+                card.addEventListener('mouseout', function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = 'none';
+                });
+            });
+
+            // Add hover effects to buttons
+            const buttons = document.querySelectorAll('.cyber-button');
+            buttons.forEach(button => {
+                button.addEventListener('mouseover', function() {
+                    this.style.transform = 'translateY(-2px)';
+                });
+                button.addEventListener('mouseout', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+
+                button.addEventListener('click', function(e) {
+                    // Add ripple effect
+                    const ripple = document.createElement('div');
+                    ripple.className = 'ripple';
+                    this.appendChild(ripple);
+                    
+                    const rect = this.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    
+                    ripple.style.width = ripple.style.height = size + 'px';
+                    ripple.style.left = e.clientX - rect.left - size/2 + 'px';
+                    ripple.style.top = e.clientY - rect.top - size/2 + 'px';
+                    
+                    setTimeout(() => ripple.remove(), 600);
+                });
+            });
+
+            // Add aurora effect to header
+            const header = document.querySelector('header');
+            header.addEventListener('mousemove', function(e) {
+                const rect = this.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                this.style.background = `radial-gradient(circle at ${x}px ${y}px, 
+                    rgba(0, 255, 229, 0.1),
+                    rgba(153, 51, 255, 0.1),
+                    transparent 50%)`;
+            });
+
+            header.addEventListener('mouseleave', function() {
+                this.style.background = 'none';
+            });
+        });
+    </script>
+</body>
+</html> 

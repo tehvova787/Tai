@@ -1,0 +1,37 @@
+{
+  "security": {
+    "enabled": true,
+    "secrets": {
+      "auto_create": true,
+      "refresh_interval": 300
+    },
+    "jwt": {
+      "auto_rotate": true,
+      "rotation_days": 30
+    }
+  },
+  "memory_management": {
+    "enabled": true,
+    "memory_limit_mb": 1024,
+    "warning_threshold": 0.8,
+    "critical_threshold": 0.95
+  },
+  "logging": {
+    "enabled": true,
+    "max_log_age_days": 30,
+    "max_bytes": 10485760,
+    "backup_count": 10,
+    "compress_logs": true,
+    "filter_sensitive": true
+  },
+  "database": {
+    "enabled": true,
+    "min_connections": 2,
+    "max_connections": 10,
+    "connection_lifetime": 3600,
+    "idle_timeout": 600
+  },
+  "thread_safety": {
+    "enabled": true
+  }
+} 
