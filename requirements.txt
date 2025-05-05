@@ -96,7 +96,7 @@ lxml>=4.9.0
 
 # Blockchain integration
 toncenter>=0.0.4
-pytonlib>=0.0.20
+# pytonlib>=0.0.20  # Removed as requires crc16 which needs Visual C++ to build
 tonsdk>=1.0.15
 
 # AR/VR support
