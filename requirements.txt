@@ -62,11 +62,12 @@ bcrypt>=4.0.0
 # Database integrations
 pymysql>=1.1.0
 
-# Machine learning and AI
-tensorflow>=2.14.0
+# Machine learning and AI (with Python 3.13 compatibility)
+tensorflow-cpu>=2.12.0; python_version < "3.12"
+tensorflow-cpu>=2.14.0; python_version >= "3.12"
 torch>=2.0.1
 transformers>=4.31.0
-keras>=2.14.0
+keras>=2.12.0; python_version < "3.12"
 
 # Data processing and visualization
 pandas>=2.0.3
@@ -97,7 +98,7 @@ lxml>=4.9.0
 # Blockchain integration
 toncenter>=0.0.4
 pytonlib>=0.0.20
-tonweb>=0.0.34
+tonsdk>=1.0.15
 
 # AR/VR support
 pypng>=0.20220715.0
