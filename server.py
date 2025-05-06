@@ -18,15 +18,22 @@ if not os.path.exists(app.static_folder):
     os.makedirs(app.static_folder, exist_ok=True)
 
 # OpenAI API configuration
-OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY', 'your-api-key-here')
-OPENAI_ORGANIZATION_ID = os.environ.get('OPENAI_ORGANIZATION_ID', 'your-organization-id-here')
+OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY', '')
+OPENAI_ORGANIZATION_ID = os.environ.get('OPENAI_ORGANIZATION_ID', '')
+
+# Check if OpenAI API key is configured
+if not OPENAI_API_KEY or OPENAI_API_KEY == 'your-api-key-here':
+    print("Warning: OPENAI_API_KEY not properly configured. Chat functionality will not work.")
+    print("To set the API key, use the following command:")
+    print("  Windows: set OPENAI_API_KEY=your_actual_api_key")
+    print("  Linux/Mac: export OPENAI_API_KEY=your_actual_api_key")
 
 # OpenAI API endpoint
 OPENAI_API_URL = "https://api.openai.com/v1/chat/completions"
 
-# New route for OpenAI API chat
-@app.route('/api/openai/chat', methods=['POST'])
-def openai_chat():
+# Chat API endpoint that calls OpenAI
+@app.route('/api/chat', methods=['POST'])
+def chat():
     try:
         data = request.get_json()
         if not data:
@@ -36,18 +43,28 @@ def openai_chat():
         if not user_message:
             return jsonify({"error": "No message provided"}), 400
             
-        session_id = data.get('session_id')
+        session_id = data.get('session_id', f"session_{int(time.time())}")
         conversation_history = data.get('conversation_history', [])
+        
+        # Check if API key is properly configured
+        if not OPENAI_API_KEY:
+            return jsonify({
+                "error": "OpenAI API key not configured",
+                "response": "Извините, я не могу обработать этот запрос, так как API ключ OpenAI не настроен. Пожалуйста, обратитесь к администратору системы.",
+                "message_id": f"error_{session_id}_{int(time.time())}",
+                "session_id": session_id
+            }), 200  # Return 200 to show error message to user rather than failing
         
         # Prepare the messages for OpenAI API
         messages = [
             {"role": "system", "content": "Ты ассистент проекта Lucky Train. Отвечай на украинском, русском или английском языке в зависимости от языка вопроса. Проект Lucky Train - это блокчейн проект на TON с метавселенной и собственным токеном LTT."}
         ]
         
-        # Add conversation history
+        # Add conversation history if provided
         for msg in conversation_history:
-            messages.append({"role": msg["role"], "content": msg["content"]})
-            
+            if isinstance(msg, dict) and 'role' in msg and 'content' in msg:
+                messages.append({"role": msg["role"], "content": msg["content"]})
+        
         # Add the current user message
         messages.append({"role": "user", "content": user_message})
         
@@ -84,12 +101,12 @@ def openai_chat():
         
         return jsonify({
             "response": assistant_message,
-            "message_id": f"openai_{session_id}_{int(time.time()) if 'time' in globals() else 0}",
+            "message_id": f"chat_{session_id}_{int(time.time())}",
             "session_id": session_id
         })
         
     except Exception as e:
-        print(f"Error in OpenAI Chat API: {e}")
+        print(f"Error in Chat API: {e}")
         return jsonify({"error": "Internal server error", "message": str(e)}), 500
 
 # Simple home route
@@ -215,6 +232,20 @@ def homepage():
         return send_from_directory(base_dir, 'homepage.html')
     except:
         return "Homepage file not found. Using default page instead.", 404
+
+# LuckyTrainAI chat route
+@app.route('/luckytrainai-chat')
+def luckytrainai_chat():
+    return render_template('luckytrainai-chat.html', 
+                          title="LuckyTrainAI Чат",
+                          welcome_message="Привет! Я LuckyTrainAI, чем могу помочь?")
+
+# LuckyTrainAI interface route
+@app.route('/luckytrainai')
+def luckytrainai():
+    return render_template('luckytrainai.html', 
+                          title="LuckyTrainAI Интерфейс",
+                          welcome_message="Добро пожаловать в интерфейс LuckyTrainAI!")
 
 # Run the app
 if __name__ == '__main__':
