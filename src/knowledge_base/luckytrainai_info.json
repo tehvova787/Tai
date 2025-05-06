@@ -1,0 +1,21 @@
+{
+  "project_info": {
+    "name": "Lucky Train",
+    "blockchain": "TON (The Open Network)",
+    "token": "LTT (Lucky Train Token)",
+    "description": "A metaverse project built on TON blockchain with its own token economy."
+  },
+  "token_details": {
+    "name": "Lucky Train Token",
+    "symbol": "LTT",
+    "model": "Deflationary",
+    "uses": [
+      "Metaverse transactions",
+      "Staking",
+      "Governance"
+    ]
+  },
+  "metaverse_info": {
+    "description": "Virtual world with gaming elements where users can interact, build, and participate in the economy based on LTT token."
+  }
+}

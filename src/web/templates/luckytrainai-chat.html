@@ -41,9 +41,14 @@
             const chatMessages = document.getElementById('chat-messages');
             const statusIndicator = document.getElementById('status-indicator');
             let sessionId = null;
+            let conversationHistory = [];
 
             // Add initial welcome message
             addMessage('assistant', '{{ welcome_message }}');
+            conversationHistory.push({
+                role: 'assistant',
+                content: '{{ welcome_message }}'
+            });
 
             // Create particles
             createParticles();
@@ -73,6 +78,14 @@
                 `;
                 chatMessages.appendChild(messageDiv);
                 chatMessages.scrollTop = chatMessages.scrollHeight;
+
+                // Add to conversation history
+                if (!conversationHistory.some(msg => msg.role === role && msg.content === content)) {
+                    conversationHistory.push({
+                        role: role,
+                        content: content
+                    });
+                }
 
                 // Add hover effect
                 messageDiv.addEventListener('mouseover', function() {
@@ -109,7 +122,8 @@
                         },
                         body: JSON.stringify({
                             message: message,
-                            session_id: sessionId
+                            session_id: sessionId,
+                            conversation_history: conversationHistory
                         })
                     });
 
