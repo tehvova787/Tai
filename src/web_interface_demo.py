@@ -540,21 +540,37 @@ class LuckyTrainWebInterfaceDemo:
         except Exception as e:
             logger.error(f"Error calling OpenAI API with GPT-4: {e}")
             try:
-                # Fallback to GPT-3.5 if GPT-4 fails
+                # Fallback to GPT-4o mini if GPT-4 fails
                 completion = openai.ChatCompletion.create(
-                    model="gpt-3.5-turbo",
+                    model="gpt-4o-mini",  # Using GPT-4o mini as a fallback option
                     messages=messages,
-                    max_tokens=800,
+                    max_tokens=900,
                     temperature=0.7
                 )
                 
                 # Extract response
                 response = completion.choices[0].message.content
+                logger.info("Successfully generated response using GPT-4o mini")
                 return response
             except Exception as e2:
-                logger.error(f"Error calling OpenAI API with fallback model: {e2}")
-                # Fallback to demo response if all API calls fail
-                return self._generate_demo_response(message)
+                logger.error(f"Error calling OpenAI API with GPT-4o mini: {e2}")
+                try:
+                    # Fallback to GPT-3.5 if GPT-4o mini also fails
+                    completion = openai.ChatCompletion.create(
+                        model="gpt-3.5-turbo",
+                        messages=messages,
+                        max_tokens=800,
+                        temperature=0.7
+                    )
+                    
+                    # Extract response
+                    response = completion.choices[0].message.content
+                    logger.info("Successfully generated response using GPT-3.5-turbo")
+                    return response
+                except Exception as e3:
+                    logger.error(f"Error calling OpenAI API with fallback model GPT-3.5-turbo: {e3}")
+                    # Fallback to demo response if all API calls fail
+                    return self._generate_demo_response(message)
     
     def _generate_demo_response(self, message):
         """Generate a demo response based on the message content.
