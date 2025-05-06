@@ -1,7 +1,8 @@
 """
-Simplified Web Interface Demo for Lucky Train AI Assistant
+Integrated Web Interface Demo for Lucky Train AI Assistant
 
-This module provides a simplified web interface for demonstrating the new LuckyTrainAI UI.
+This module provides a web interface for demonstrating the LuckyTrainAI system using
+the unified system architecture that integrates all components.
 """
 
 import os
@@ -23,19 +24,15 @@ except Exception as e:
 from flask import Flask, request, jsonify, render_template, Response, stream_with_context, send_from_directory, session
 from flask_cors import CORS
 
+# Import unified system integrator
+from unified_system_integrator import create_unified_system, UnifiedSystem
+
 # Make requests module optional - we don't actually use it directly in the demo mode
 try:
     import requests
 except ImportError:
     requests = None
     logging.warning("The 'requests' module is not available. Some features may be limited.")
-
-# Make OpenAI module optional - we'll fall back to demo mode if it's not available
-try:
-    import openai
-except ImportError:
-    openai = None
-    logging.warning("The 'openai' module is not available. AI functionality will be limited to demo responses.")
 
 # Configure logging
 logging.basicConfig(
@@ -45,12 +42,13 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 class LuckyTrainWebInterfaceDemo:
-    """Simplified web interface demo for the Lucky Train AI assistant."""
+    """Integrated web interface for the Lucky Train AI assistant."""
     
-    def __init__(self, openai_api_key=None, knowledge_base_path=None):
+    def __init__(self, config_path=None, openai_api_key=None, knowledge_base_path=None):
         """Initialize the web interface demo.
         
         Args:
+            config_path: Path to the configuration file
             openai_api_key: Optional OpenAI API key. If not provided, will try to get from environment variable.
             knowledge_base_path: Optional path to knowledge base files. If not provided, will use default location.
         """
@@ -65,41 +63,28 @@ class LuckyTrainWebInterfaceDemo:
         self.app.secret_key = os.environ.get('FLASK_SECRET_KEY', os.urandom(24))
         
         # Initialize OpenAI API key
-        self.openai_api_key = None
+        self.openai_api_key = openai_api_key or os.environ.get('OPENAI_API_KEY')
         
-        # Try to get API key from multiple sources, in order of preference:
-        # 1. Directly provided parameter
-        # 2. Environment variable OPENAI_API_KEY
-        # 3. Config file if exists
-        api_key_sources = [
-            ("parameter", openai_api_key),
-            ("environment", os.environ.get("OPENAI_API_KEY")),
-        ]
-        
-        # Try each potential API key source
-        for source_name, potential_key in api_key_sources:
-            if (potential_key and 
-                potential_key.strip() != "" and 
-                '\0' not in potential_key and 
-                potential_key != "your_openai_api_key_here" and
-                potential_key != "sk-"):
-                self.openai_api_key = potential_key
-                logger.info(f"Using OpenAI API key from {source_name}")
-                break
-                
-        # Check if OpenAI module is available and API key is valid
-        if openai is not None:
-            if self.openai_api_key:
-                openai.api_key = self.openai_api_key
-                logger.info("OpenAI API key configured successfully")
-            else:
-                logger.warning("No valid OpenAI API key provided. AI functionality will be limited to demo responses.")
-        else:
-            logger.warning("OpenAI module not available. AI functionality will be limited to demo responses.")
+        # Determine if running in demo mode
+        self.demo_mode = not self.openai_api_key
+        if self.demo_mode:
+            logger.info("Running in demo mode - using predefined responses")
         
         # Initialize knowledge base
         self.knowledge_base_path = knowledge_base_path or os.path.join(os.path.dirname(__file__), "knowledge_base")
         self.knowledge_base = self._load_knowledge_base()
+        
+        # Initialize unified system if not in demo mode
+        self.unified_system = None
+        if not self.demo_mode:
+            try:
+                logger.info("Initializing unified system...")
+                self.unified_system = create_unified_system(config_path)
+                logger.info("Unified system initialized successfully")
+            except Exception as e:
+                logger.error(f"Failed to initialize unified system: {e}")
+                logger.warning("Falling back to demo mode")
+                self.demo_mode = True
         
         # Set up routes
         self._setup_routes()
@@ -177,6 +162,11 @@ class LuckyTrainWebInterfaceDemo:
         # Knowledge base management routes
         self.app.route("/api/knowledge", methods=["GET", "POST"])(self.knowledge_api)
         
+        # Unified system API routes
+        self.app.route("/api/unified", methods=["POST"])(self.unified_api)
+        self.app.route("/api/blockchain", methods=["GET", "POST"])(self.blockchain_api)
+        self.app.route("/api/metaverse", methods=["GET", "POST"])(self.metaverse_api)
+        
         # Static files and media
         self.app.route("/static/<path:path>")(self.serve_static)
         self.app.route("/media/<path:path>")(self.serve_media)
@@ -220,7 +210,8 @@ class LuckyTrainWebInterfaceDemo:
         """
         return render_template(
             "simple.html",
-            title="Lucky Train AI Assistant Demo"
+            title="Lucky Train AI Assistant Demo",
+            unified_mode=not self.demo_mode
         )
     
     def chat_page(self):
@@ -233,6 +224,7 @@ class LuckyTrainWebInterfaceDemo:
             "chat.html",
             title="Lucky Train AI Assistant Demo - Chat",
             theme="light",
+            unified_mode=not self.demo_mode,
             welcome_message="Привет! Я AI-ассистент проекта Lucky Train. Задайте мне вопрос о проекте, и я постараюсь дать вам детальный ответ."
         )
     
@@ -244,7 +236,8 @@ class LuckyTrainWebInterfaceDemo:
         """
         return render_template(
             "test.html",
-            title="Test Page"
+            title="Test Page",
+            unified_mode=not self.demo_mode
         )
     
     def simple_page(self):
@@ -255,7 +248,8 @@ class LuckyTrainWebInterfaceDemo:
         """
         return render_template(
             "simple.html",
-            title="Simple Lucky Train AI Page"
+            title="Simple Lucky Train AI Page",
+            unified_mode=not self.demo_mode
         )
     
     def luckytrainai_index(self):
@@ -264,10 +258,17 @@ class LuckyTrainWebInterfaceDemo:
         Returns:
             The rendered LuckyTrainAI index page.
         """
+        # Get connected services if unified system is active
+        connected_services = []
+        if self.unified_system:
+            connected_services = list(self.unified_system.services.keys())
+        
         return render_template(
             "luckytrainai.html",
             title="LuckyTrainAI Demo",
             theme="dark",
+            unified_mode=not self.demo_mode,
+            connected_services=connected_services,
             welcome_message="Привет! Я AI-ассистент проекта Lucky Train. Задайте мне вопрос о проекте, и я постараюсь дать вам детальный ответ на основе актуальной информации."
         )
     
@@ -277,10 +278,17 @@ class LuckyTrainWebInterfaceDemo:
         Returns:
             The rendered LuckyTrainAI chat page.
         """
+        # Get connected services if unified system is active
+        connected_services = []
+        if self.unified_system:
+            connected_services = list(self.unified_system.services.keys())
+            
         return render_template(
             "luckytrainai-chat.html",
             title="LuckyTrainAI Demo - Чат",
             theme="dark",
+            unified_mode=not self.demo_mode,
+            connected_services=connected_services,
             welcome_message="Привет! Я AI-ассистент проекта Lucky Train. Задайте мне вопрос о проекте, и я постараюсь дать вам детальный ответ на основе актуальной информации."
         )
     
@@ -292,10 +300,25 @@ class LuckyTrainWebInterfaceDemo:
         """
         if request.method == "GET":
             # Return current settings (without exposing API key)
-            return jsonify({
+            settings = {
                 "has_openai_api_key": bool(self.openai_api_key),
-                "has_knowledge_base": bool(self.knowledge_base)
-            })
+                "has_knowledge_base": bool(self.knowledge_base),
+                "demo_mode": self.demo_mode,
+                "unified_mode": not self.demo_mode
+            }
+            
+            # Add unified system info if available
+            if self.unified_system:
+                settings["unified_system"] = {
+                    "available_services": list(self.unified_system.services.keys()),
+                    "active_services": [
+                        name for name, thread in self.unified_system.service_threads.items() 
+                        if thread.is_alive()
+                    ]
+                }
+                
+            return jsonify(settings)
+            
         elif request.method == "POST":
             # Update settings
             data = request.get_json()
@@ -306,12 +329,24 @@ class LuckyTrainWebInterfaceDemo:
             api_key = data.get("openai_api_key")
             if api_key and '\0' not in api_key:
                 self.openai_api_key = api_key
-                openai.api_key = api_key
+                os.environ["OPENAI_API_KEY"] = api_key
+                
+                # Re-initialize unified system if we were in demo mode
+                if self.demo_mode and not self.unified_system:
+                    try:
+                        self.unified_system = create_unified_system()
+                        self.demo_mode = False
+                        logger.info("Unified system initialized with new API key")
+                    except Exception as e:
+                        logger.error(f"Failed to initialize unified system: {e}")
+                
                 logger.info("OpenAI API key updated")
                 
                 return jsonify({
                     "success": True,
-                    "message": "API key updated successfully"
+                    "message": "API key updated successfully",
+                    "demo_mode": self.demo_mode,
+                    "unified_mode": not self.demo_mode
                 })
             
             return jsonify({
@@ -325,7 +360,17 @@ class LuckyTrainWebInterfaceDemo:
             JSON response with knowledge base info or confirmation of updates.
         """
         if request.method == "GET":
-            # Return list of knowledge base files (not the full content for security)
+            # Check if we should use unified system
+            if self.unified_system and "knowledge_base" in self.unified_system.services:
+                # Use knowledge base service from unified system
+                kb_service = self.unified_system.services["knowledge_base"]
+                
+                # Return list of knowledge base entries (implementation depends on the actual service)
+                if hasattr(kb_service, "list_entries"):
+                    kb_list = kb_service.list_entries()
+                    return jsonify({"knowledge_base": kb_list})
+            
+            # Fallback to local knowledge base
             kb_list = []
             for name, data in self.knowledge_base.items():
                 kb_list.append({
@@ -350,6 +395,25 @@ class LuckyTrainWebInterfaceDemo:
             if not name or not content:
                 return jsonify({"error": "Name and content are required"}), 400
             
+            # Check if we should use unified system
+            if self.unified_system and "knowledge_base" in self.unified_system.services:
+                # Use knowledge base service from unified system
+                kb_service = self.unified_system.services["knowledge_base"]
+                
+                # Add or update entry (implementation depends on the actual service)
+                if hasattr(kb_service, "add_entry"):
+                    success = kb_service.add_entry(name, content)
+                    if success:
+                        return jsonify({
+                            "success": True,
+                            "message": "Knowledge base updated successfully"
+                        })
+                    else:
+                        return jsonify({
+                            "error": "Failed to update knowledge base"
+                        }), 500
+            
+            # Fallback to local knowledge base
             # Sanitize filename
             name = "".join(c for c in name if c.isalnum() or c in "_-")
             
@@ -402,10 +466,26 @@ class LuckyTrainWebInterfaceDemo:
         try:
             start_time = time.time()
             
-            # Generate response using OpenAI if available, otherwise use demo
-            if openai is not None and self.openai_api_key:
-                response = self._generate_openai_response(message, session_id)
+            # Use unified system if available, otherwise use demo response
+            if not self.demo_mode and self.unified_system:
+                # Prepare request data
+                request_data = {
+                    "message": message,
+                    "user_id": user_id,
+                    "platform": "web",
+                    "session_id": session_id
+                }
+                
+                # Handle request through unified system
+                result = self.unified_system.handle_request(request_data)
+                
+                # Extract response
+                if isinstance(result, dict) and "response" in result:
+                    response = result["response"]
+                else:
+                    response = str(result)
             else:
+                # Generate demo response
                 response = self._generate_demo_response(message)
             
             # Calculate response time
@@ -432,7 +512,8 @@ class LuckyTrainWebInterfaceDemo:
                 "session_id": session_id,
                 "message_id": message_id,
                 "response": response,
-                "response_time": response_time
+                "response_time": response_time,
+                "unified_mode": not self.demo_mode
             })
             
         except Exception as e:
@@ -442,6 +523,233 @@ class LuckyTrainWebInterfaceDemo:
                 "error": "Internal server error",
                 "message": str(e)
             }), 500
+    
+    def unified_api(self):
+        """Handle the unified system API route.
+        
+        Returns:
+            JSON response with the result from the unified system.
+        """
+        if self.demo_mode or not self.unified_system:
+            return jsonify({
+                "error": "Unified system not available",
+                "demo_mode": self.demo_mode
+            }), 400
+        
+        # Get request data
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "No JSON data provided"}), 400
+        
+        # Validate required fields
+        if "action" not in data:
+            return jsonify({"error": "Action is required"}), 400
+        
+        action = data["action"]
+        
+        try:
+            if action == "get_services":
+                # Return list of available services
+                return jsonify({
+                    "services": list(self.unified_system.services.keys()),
+                    "active_services": [
+                        name for name, thread in self.unified_system.service_threads.items() 
+                        if thread.is_alive()
+                    ]
+                })
+                
+            elif action == "start_service":
+                # Start a service
+                service_name = data.get("service")
+                if not service_name:
+                    return jsonify({"error": "Service name is required"}), 400
+                    
+                if service_name not in self.unified_system.services:
+                    return jsonify({"error": f"Service {service_name} not found"}), 404
+                
+                # Start the service
+                self.unified_system.start_services([service_name])
+                
+                return jsonify({
+                    "success": True,
+                    "message": f"Service {service_name} started"
+                })
+                
+            elif action == "stop_service":
+                # Stop a service
+                service_name = data.get("service")
+                if not service_name:
+                    return jsonify({"error": "Service name is required"}), 400
+                    
+                if service_name not in self.unified_system.services:
+                    return jsonify({"error": f"Service {service_name} not found"}), 404
+                
+                # Stop the service
+                self.unified_system.stop_services([service_name])
+                
+                return jsonify({
+                    "success": True,
+                    "message": f"Service {service_name} stopped"
+                })
+                
+            elif action == "handle_request":
+                # Handle a request through the unified system
+                request_data = data.get("request_data")
+                route = data.get("route")
+                
+                if not request_data:
+                    return jsonify({"error": "Request data is required"}), 400
+                
+                # Handle the request
+                result = self.unified_system.handle_request(request_data, route)
+                
+                return jsonify({
+                    "result": result
+                })
+                
+            else:
+                return jsonify({"error": f"Unknown action: {action}"}), 400
+                
+        except Exception as e:
+            logger.error(f"Error handling unified API request: {e}")
+            
+            return jsonify({
+                "error": "Internal server error",
+                "message": str(e)
+            }), 500
+    
+    def blockchain_api(self):
+        """Handle blockchain API requests.
+        
+        Returns:
+            JSON response with blockchain data or operation result.
+        """
+        if self.demo_mode or not self.unified_system or "blockchain" not in self.unified_system.services:
+            # Return demo data in demo mode
+            if request.method == "GET":
+                return jsonify({
+                    "demo": True,
+                    "blockchain": "TON",
+                    "token": "LTT",
+                    "price": "0.0123 TON",
+                    "market_cap": "1,230,000 TON",
+                    "holders": 3500,
+                    "transactions": 12500
+                })
+            return jsonify({"error": "Blockchain service not available"}), 400
+        
+        # Get blockchain service
+        blockchain_service = self.unified_system.services["blockchain"]
+        
+        if request.method == "GET":
+            # Return blockchain info
+            try:
+                return jsonify(blockchain_service.get_info())
+            except Exception as e:
+                logger.error(f"Error getting blockchain info: {e}")
+                return jsonify({"error": str(e)}), 500
+                
+        elif request.method == "POST":
+            # Perform blockchain operation
+            data = request.get_json()
+            if not data:
+                return jsonify({"error": "No JSON data provided"}), 400
+                
+            operation = data.get("operation")
+            if not operation:
+                return jsonify({"error": "Operation is required"}), 400
+                
+            try:
+                if operation == "get_balance":
+                    address = data.get("address")
+                    if not address:
+                        return jsonify({"error": "Address is required"}), 400
+                        
+                    balance = blockchain_service.get_balance(address)
+                    return jsonify({"balance": balance})
+                    
+                elif operation == "get_transaction":
+                    tx_id = data.get("tx_id")
+                    if not tx_id:
+                        return jsonify({"error": "Transaction ID is required"}), 400
+                        
+                    tx = blockchain_service.get_transaction(tx_id)
+                    return jsonify({"transaction": tx})
+                    
+                else:
+                    return jsonify({"error": f"Unknown operation: {operation}"}), 400
+                    
+            except Exception as e:
+                logger.error(f"Error performing blockchain operation: {e}")
+                return jsonify({"error": str(e)}), 500
+    
+    def metaverse_api(self):
+        """Handle metaverse API requests.
+        
+        Returns:
+            JSON response with metaverse data or operation result.
+        """
+        if self.demo_mode or not self.unified_system or "metaverse" not in self.unified_system.services:
+            # Return demo data in demo mode
+            if request.method == "GET":
+                return jsonify({
+                    "demo": True,
+                    "metaverse": "Lucky Train World",
+                    "online_users": 120,
+                    "locations": ["Central Station", "Market Square", "Mining District", "Residential Area"],
+                    "events": [
+                        {"name": "Token Hunt", "time": "Daily at 18:00 UTC"},
+                        {"name": "Builder's Challenge", "time": "Weekends"}
+                    ]
+                })
+            return jsonify({"error": "Metaverse service not available"}), 400
+        
+        # Get metaverse service
+        metaverse_service = self.unified_system.services["metaverse"]
+        
+        if request.method == "GET":
+            # Return metaverse info
+            try:
+                return jsonify(metaverse_service.get_info())
+            except Exception as e:
+                logger.error(f"Error getting metaverse info: {e}")
+                return jsonify({"error": str(e)}), 500
+                
+        elif request.method == "POST":
+            # Perform metaverse operation
+            data = request.get_json()
+            if not data:
+                return jsonify({"error": "No JSON data provided"}), 400
+                
+            operation = data.get("operation")
+            if not operation:
+                return jsonify({"error": "Operation is required"}), 400
+                
+            try:
+                if operation == "get_user_location":
+                    user_id = data.get("user_id")
+                    if not user_id:
+                        return jsonify({"error": "User ID is required"}), 400
+                        
+                    location = metaverse_service.get_user_location(user_id)
+                    return jsonify({"location": location})
+                    
+                elif operation == "send_notification":
+                    user_id = data.get("user_id")
+                    message = data.get("message")
+                    
+                    if not user_id or not message:
+                        return jsonify({"error": "User ID and message are required"}), 400
+                        
+                    success = metaverse_service.send_notification(user_id, message)
+                    return jsonify({"success": success})
+                    
+                else:
+                    return jsonify({"error": f"Unknown operation: {operation}"}), 400
+                    
+            except Exception as e:
+                logger.error(f"Error performing metaverse operation: {e}")
+                return jsonify({"error": str(e)}), 500
     
     def _generate_knowledge_context(self, message):
         """Generate context from knowledge base relevant to the user's message.
@@ -507,72 +815,6 @@ class LuckyTrainWebInterfaceDemo:
         context = "\n".join(context_parts)
         
         return context
-    
-    def _generate_openai_response(self, message, session_id):
-        """Generate a response using OpenAI.
-        
-        Args:
-            message: The user's message.
-            session_id: The session ID.
-            
-        Returns:
-            The generated response.
-        """
-        # Check if OpenAI is properly configured
-        if not openai or not self.openai_api_key:
-            # Fall back to demo response if OpenAI is not available
-            logger.warning("OpenAI not properly configured. Using demo response.")
-            return self._generate_demo_response(message)
-        
-        try:
-            session = self._get_session(session_id)
-            
-            # Get relevant knowledge base context
-            knowledge_context = self._generate_knowledge_context(message)
-            
-            # Prepare conversation history
-            messages = []
-            if session and session["messages"]:
-                # Add up to 10 most recent messages for context
-                for msg in session["messages"][-10:]:
-                    messages.append({
-                        "role": msg["role"],
-                        "content": msg["content"]
-                    })
-            
-            # Add system message with detailed instructions and knowledge base context
-            system_prompt = """Ты AI-ассистент проекта Lucky Train на блокчейне TON. Твоя задача - давать подробные и исчерпывающие ответы на вопросы о проекте, токене LTT, метавселенной и блокчейне."""
-            
-            if knowledge_context:
-                system_prompt += f"\n\nИспользуй следующую информацию из базы знаний:\n{knowledge_context}"
-            
-            messages.insert(0, {
-                "role": "system",
-                "content": system_prompt
-            })
-            
-            # Add user message
-            messages.append({
-                "role": "user",
-                "content": message
-            })
-            
-            # Generate response
-            completion = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
-                messages=messages,
-                max_tokens=1000,
-                temperature=0.7
-            )
-            
-            # Extract response
-            response = completion.choices[0].message.content
-            
-            return response
-        except Exception as e:
-            logger.error(f"Error generating OpenAI response: {e}")
-            # Fall back to demo response in case of error
-            return self._generate_demo_response(message)
     
     def _generate_demo_response(self, message):
         """Generate a demo response without using OpenAI.
@@ -682,16 +924,49 @@ class LuckyTrainWebInterfaceDemo:
             port: The port to run on.
             debug: Whether to run in debug mode.
         """
+        # Start unified system services if available
+        if self.unified_system:
+            try:
+                # Start essential services
+                essential_services = ["api_gateway", "assistant_core", "knowledge_base", "ai_model"]
+                self.unified_system.start_services(essential_services)
+                logger.info(f"Started essential unified system services: {essential_services}")
+            except Exception as e:
+                logger.error(f"Failed to start unified system services: {e}")
+        
         logger.info(f"Starting web interface demo on {host}:{port}")
         self.app.run(host=host, port=port, debug=debug)
 
 # Run the web interface if executed directly
 if __name__ == "__main__":
+    import argparse
+    
+    # Parse command line arguments
+    parser = argparse.ArgumentParser(description="Integrated Web Interface Demo")
+    parser.add_argument("--port", type=int, default=10000, help="Port to run the web interface on")
+    parser.add_argument("--host", default="0.0.0.0", help="Host to run the web interface on")
+    parser.add_argument("--debug", action="store_true", help="Run in debug mode")
+    parser.add_argument("--config", help="Path to configuration file")
+    parser.add_argument("--demo", action="store_true", help="Force demo mode")
+    parser.add_argument("--openai-api-key", help="OpenAI API key")
+    parser.add_argument("--knowledge-base-path", help="Path to knowledge base files")
+    
+    args = parser.parse_args()
+    
     # Get port from environment variable (Render sets PORT) or use default
-    port = int(os.environ.get("PORT", os.environ.get("WEB_PORT", 10000)))
+    port = int(os.environ.get("PORT", os.environ.get("WEB_PORT", args.port)))
+    
+    # Force demo mode if specified
+    openai_api_key = args.openai_api_key
+    if args.demo:
+        openai_api_key = None
     
     # Initialize the web interface demo
-    demo = LuckyTrainWebInterfaceDemo()
+    demo = LuckyTrainWebInterfaceDemo(
+        config_path=args.config,
+        openai_api_key=openai_api_key,
+        knowledge_base_path=args.knowledge_base_path
+    )
     
     # Run the demo
-    demo.run(port=port, debug=True) 
+    demo.run(host=args.host, port=port, debug=args.debug) 
