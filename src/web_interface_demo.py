@@ -77,6 +77,9 @@ class LuckyTrainWebInterfaceDemo:
         # Static files and media
         self.app.route("/static/<path:path>")(self.serve_static)
         self.app.route("/media/<path:path>")(self.serve_media)
+        
+        # Favicon route
+        self.app.route("/favicon.ico")(self.serve_favicon)
     
     def _create_session(self) -> str:
         """Create a new session.
@@ -388,6 +391,14 @@ class LuckyTrainWebInterfaceDemo:
         """
         media_path = os.path.join(self.app.static_folder, "media")
         return send_from_directory(media_path, path)
+        
+    def serve_favicon(self):
+        """Serve the favicon.ico file.
+        
+        Returns:
+            The favicon file.
+        """
+        return send_from_directory(self.app.static_folder, "images/favicon.ico")
     
     def run(self, host: str = "0.0.0.0", port: int = 5000, debug: bool = False):
         """Run the web interface.
@@ -409,6 +420,6 @@ if __name__ == "__main__":
     web_interface = LuckyTrainWebInterfaceDemo(openai_api_key=None)
     
     # Get port from environment variable (for Render deployment)
-    port = int(os.environ.get("PORT", 5000))
+    port = int(os.environ.get("PORT", 10000))
     
     web_interface.run(host="0.0.0.0", port=port, debug=True) 
