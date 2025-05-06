@@ -10,6 +10,14 @@ from datetime import datetime
 import time
 import uuid
 import json
+import dotenv
+
+# Load environment variables from .env file if it exists
+try:
+    dotenv.load_dotenv()
+    logging.info("Loaded environment variables from .env file")
+except Exception as e:
+    logging.warning(f"Could not load .env file: {e}")
 
 # Import required Flask modules
 from flask import Flask, request, jsonify, render_template, Response, stream_with_context, send_from_directory, session
@@ -59,13 +67,28 @@ class LuckyTrainWebInterfaceDemo:
         # Initialize OpenAI API key
         self.openai_api_key = None
         
-        # Check if OpenAI module is available
-        if openai is not None:
-            if openai_api_key and openai_api_key.strip() != "" and '\0' not in openai_api_key and openai_api_key != "your_openai_api_key_here":
-                self.openai_api_key = openai_api_key
-            elif os.environ.get("OPENAI_API_KEY") and os.environ.get("OPENAI_API_KEY").strip() != "" and '\0' not in os.environ.get("OPENAI_API_KEY", "") and os.environ.get("OPENAI_API_KEY") != "your_openai_api_key_here":
-                self.openai_api_key = os.environ.get("OPENAI_API_KEY")
+        # Try to get API key from multiple sources, in order of preference:
+        # 1. Directly provided parameter
+        # 2. Environment variable OPENAI_API_KEY
+        # 3. Config file if exists
+        api_key_sources = [
+            ("parameter", openai_api_key),
+            ("environment", os.environ.get("OPENAI_API_KEY")),
+        ]
+        
+        # Try each potential API key source
+        for source_name, potential_key in api_key_sources:
+            if (potential_key and 
+                potential_key.strip() != "" and 
+                '\0' not in potential_key and 
+                potential_key != "your_openai_api_key_here" and
+                potential_key != "sk-"):
+                self.openai_api_key = potential_key
+                logger.info(f"Using OpenAI API key from {source_name}")
+                break
                 
+        # Check if OpenAI module is available and API key is valid
+        if openai is not None:
             if self.openai_api_key:
                 openai.api_key = self.openai_api_key
                 logger.info("OpenAI API key configured successfully")
@@ -664,8 +687,8 @@ class LuckyTrainWebInterfaceDemo:
 
 # Run the web interface if executed directly
 if __name__ == "__main__":
-    # Get port from environment variable or use default
-    port = int(os.environ.get("WEB_PORT", 10000))
+    # Get port from environment variable (Render sets PORT) or use default
+    port = int(os.environ.get("PORT", os.environ.get("WEB_PORT", 10000)))
     
     # Initialize the web interface demo
     demo = LuckyTrainWebInterfaceDemo()

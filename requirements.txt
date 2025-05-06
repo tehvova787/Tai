@@ -73,7 +73,6 @@ seaborn>=0.12.2
 plotly>=5.16.1
 
 # Additional utilities
-python-dotenv>=0.20.0
 pydantic>=1.9.1
 ujson>=5.4.0
 
