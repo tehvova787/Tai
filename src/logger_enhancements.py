@@ -591,4 +591,32 @@ def log_execution_time(logger: Optional[EnhancedLogger] = None, level: str = "DE
             
             return result
         return wrapper
-    return decorator 
+    return decorator
+
+def configure_enhanced_logging(app_name: str = "lucky_train_ai", config: Dict = None) -> LogManager:
+    """Configure enhanced logging for the application.
+    
+    Args:
+        app_name: Application name
+        config: Log configuration
+        
+    Returns:
+        Configured log manager
+    """
+    # Set default configuration
+    if config is None:
+        config = {}
+    
+    # Ensure logs directory exists
+    os.makedirs(LOGS_DIR, exist_ok=True)
+    
+    # Initialize log manager
+    log_manager = get_log_manager(config)
+    
+    # Get root logger for the application
+    root_logger = log_manager.get_logger(app_name)
+    
+    # Log start message
+    root_logger.info(f"Enhanced logging initialized for {app_name}")
+    
+    return log_manager 

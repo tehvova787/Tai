@@ -15,9 +15,68 @@ import time
 import threading
 import gc
 from typing import Dict, List, Any, Optional, Callable, Union
-import psutil
+# Try to import psutil, use a fallback if not available
+try:
+    import psutil
+    HAVE_PSUTIL = True
+except ImportError:
+    HAVE_PSUTIL = False
+    logger = logging.getLogger(__name__)
+    logger.warning(
+        "psutil not installed. Memory monitoring will be limited. "
+        "Install with: pip install psutil"
+    )
+    # Create a mock psutil for basic functionality
+    class MockProcess:
+        def __init__(self, pid):
+            self.pid = pid
+        
+        def memory_info(self):
+            class MemInfo:
+                def __init__(self):
+                    self.rss = 50 * 1024 * 1024  # Mock 50MB RSS
+                    self.vms = 100 * 1024 * 1024  # Mock 100MB VMS
+            return MemInfo()
+    
+    class MockVirtualMemory:
+        def __init__(self):
+            self.total = 4 * 1024 * 1024 * 1024  # Mock 4GB total
+            self.available = 2 * 1024 * 1024 * 1024  # Mock 2GB available
+            self.used = 2 * 1024 * 1024 * 1024  # Mock 2GB used
+            self.percent = 50.0  # Mock 50% used
+    
+    class MockPsutil:
+        @staticmethod
+        def Process(pid):
+            return MockProcess(pid)
+        
+        @staticmethod
+        def virtual_memory():
+            return MockVirtualMemory()
+    
+    # Use the mock as a fallback
+    psutil = MockPsutil()
+
 import weakref
-import numpy as np
+try:
+    import numpy as np
+    HAVE_NUMPY = True
+except ImportError:
+    HAVE_NUMPY = False
+    logger = logging.getLogger(__name__)
+    logger.warning(
+        "numpy not installed. Memory monitoring for numpy arrays will be limited. "
+        "Install with: pip install numpy"
+    )
+    # Create a simple numpy mock
+    class MockNumpy:
+        class ndarray:
+            def __init__(self, *args, **kwargs):
+                self.nbytes = 1024 * 1024  # Mock 1MB
+    
+    # Use the mock as a fallback
+    np = MockNumpy()
+
 from functools import wraps
 
 # Configure logging

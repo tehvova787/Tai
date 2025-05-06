@@ -16,12 +16,120 @@ import os
 import time
 import logging
 import threading
-import psutil
+# Try to import psutil, use a fallback if not available
+try:
+    import psutil
+    HAVE_PSUTIL = True
+except ImportError:
+    HAVE_PSUTIL = False
+    logger = logging.getLogger(__name__)
+    logger.warning(
+        "psutil not installed. System metrics monitoring will be limited. "
+        "Install with: pip install psutil"
+    )
+    # Create a mock psutil for basic functionality
+    class MockProcess:
+        @staticmethod
+        def open_files():
+            return []
+    
+    class MockPsutil:
+        @staticmethod
+        def cpu_percent(interval=None):
+            return 0.0
+        
+        @staticmethod
+        def virtual_memory():
+            class VirtualMemory:
+                def __init__(self):
+                    self.used = 1024 * 1024 * 1024  # Mock 1GB used
+                    self.percent = 25.0  # Mock 25% used
+            return VirtualMemory()
+        
+        @staticmethod
+        def disk_usage(path):
+            class DiskUsage:
+                def __init__(self):
+                    self.percent = 50.0  # Mock 50% used
+            return DiskUsage()
+        
+        @staticmethod
+        def Process(pid=None):
+            return MockProcess()
+    
+    # Use the mock as a fallback
+    psutil = MockPsutil()
+
 import socket
 import gc
 from typing import Dict, List, Any, Optional, Union, Callable
-from prometheus_client import start_http_server, Counter, Gauge, Histogram, Summary
-from prometheus_client.core import CollectorRegistry
+# Try to import prometheus_client, use mock classes if not available
+try:
+    from prometheus_client import start_http_server, Counter, Gauge, Histogram, Summary
+    from prometheus_client.core import CollectorRegistry
+    HAVE_PROMETHEUS = True
+except ImportError:
+    HAVE_PROMETHEUS = False
+    logger = logging.getLogger(__name__)
+    logger.warning(
+        "prometheus_client not installed. Metrics collection will be disabled. "
+        "Install with: pip install prometheus-client"
+    )
+    # Create mock classes for Prometheus client
+    class CollectorRegistry:
+        def __init__(self):
+            pass
+    
+    class Counter:
+        def __init__(self, *args, **kwargs):
+            pass
+        
+        def labels(self, **kwargs):
+            return self
+        
+        def inc(self, amount=1):
+            pass
+    
+    class Gauge:
+        def __init__(self, *args, **kwargs):
+            pass
+        
+        def labels(self, **kwargs):
+            return self
+        
+        def inc(self, amount=1):
+            pass
+        
+        def dec(self, amount=1):
+            pass
+        
+        def set(self, value):
+            pass
+    
+    class Histogram:
+        def __init__(self, *args, **kwargs):
+            pass
+        
+        def labels(self, **kwargs):
+            return self
+        
+        def observe(self, value):
+            pass
+    
+    class Summary:
+        def __init__(self, *args, **kwargs):
+            pass
+        
+        def labels(self, **kwargs):
+            return self
+        
+        def observe(self, value):
+            pass
+    
+    def start_http_server(port):
+        logger.warning(f"Mock Prometheus HTTP server would start on port {port}")
+        pass
+
 from contextlib import contextmanager
 
 # Configure logging
@@ -430,4 +538,158 @@ def get_metrics() -> MetricsCollector:
         Metrics collector instance
     """
     service = get_monitoring_service()
-    return service.metrics 
+    return service.metrics
+
+class MonitoringSystem:
+    """Unified monitoring system for Lucky Train AI.
+    
+    This class provides a unified interface for monitoring all aspects of the system,
+    including performance, memory usage, API calls, and model performance.
+    """
+    
+    def __init__(self, config: Dict = None):
+        """Initialize the monitoring system.
+        
+        Args:
+            config: Configuration dictionary
+        """
+        self.config = config or {}
+        self.enabled = self.config.get("monitoring_enabled", True)
+        self.service = get_monitoring_service(config)
+        self.metrics = self.service.metrics
+        self.started = False
+        
+        logger.info("Monitoring system initialized")
+    
+    def start(self) -> None:
+        """Start the monitoring system."""
+        if not self.enabled:
+            logger.info("Monitoring system is disabled")
+            return
+        
+        if self.started:
+            logger.info("Monitoring system already started")
+            return
+        
+        self.service.start()
+        self.started = True
+    
+    def stop(self) -> None:
+        """Stop the monitoring system."""
+        if not self.enabled or not self.started:
+            return
+        
+        self.service.stop()
+        self.started = False
+    
+    def track_request(self, method: str, endpoint: str) -> contextmanager:
+        """Get a context manager for tracking request time.
+        
+        Args:
+            method: HTTP method
+            endpoint: API endpoint
+            
+        Returns:
+            Context manager for tracking request time
+        """
+        return self.metrics.track_request_time(method, endpoint)
+    
+    def track_model(self, model_type: str, model_name: str) -> contextmanager:
+        """Get a context manager for tracking model latency.
+        
+        Args:
+            model_type: Model type (cloud, local, hybrid)
+            model_name: Model name
+            
+        Returns:
+            Context manager for tracking model latency
+        """
+        return self.metrics.track_model_time(model_type, model_name)
+    
+    def track_vector_search(self, db_type: str) -> contextmanager:
+        """Get a context manager for tracking vector search latency.
+        
+        Args:
+            db_type: Database type
+            
+        Returns:
+            Context manager for tracking vector search latency
+        """
+        return self.metrics.track_vector_search_time(db_type)
+    
+    def record_tokens(self, model_type: str, model_name: str, input_tokens: int, output_tokens: int) -> None:
+        """Record token counts for an AI model.
+        
+        Args:
+            model_type: Model type (cloud, local, hybrid)
+            model_name: Model name
+            input_tokens: Number of input tokens
+            output_tokens: Number of output tokens
+        """
+        self.metrics.record_token_count(model_type, model_name, "input", input_tokens)
+        self.metrics.record_token_count(model_type, model_name, "output", output_tokens)
+    
+    def record_cache_hit(self, cache_type: str) -> None:
+        """Record a cache hit.
+        
+        Args:
+            cache_type: Cache type
+        """
+        self.metrics.record_cache_hit(cache_type)
+    
+    def record_cache_miss(self, cache_type: str) -> None:
+        """Record a cache miss.
+        
+        Args:
+            cache_type: Cache type
+        """
+        self.metrics.record_cache_miss(cache_type)
+    
+    def update_cache_size(self, cache_type: str, size: int) -> None:
+        """Update cache size.
+        
+        Args:
+            cache_type: Cache type
+            size: Cache size
+        """
+        self.metrics.set_cache_size(cache_type, size)
+    
+    def record_error(self, module: str, error_type: str) -> None:
+        """Record an error.
+        
+        Args:
+            module: Module name
+            error_type: Error type
+        """
+        self.metrics.record_error(module, error_type)
+    
+    def get_stats(self) -> Dict:
+        """Get system statistics.
+        
+        Returns:
+            Dictionary of statistics
+        """
+        # Get basic stats from Prometheus registry
+        if not self.enabled:
+            return {"monitoring_enabled": False}
+        
+        stats = {
+            "monitoring_enabled": True,
+            "monitoring_started": self.started,
+            "metrics_port": self.service.metrics_port,
+            "collection_interval": self.service.collection_interval
+        }
+        
+        return stats
+
+# Get a singleton instance
+def get_monitoring_system(config: Dict = None) -> MonitoringSystem:
+    """Get the monitoring system instance.
+    
+    Args:
+        config: Configuration dictionary
+        
+    Returns:
+        Monitoring system instance
+    """
+    return MonitoringSystem(config) 

@@ -22,7 +22,7 @@ langdetect>=1.0.9
 
 # Vector Database
 qdrant-client>=1.6.0
-pinecone-client>=2.2.2
+pinecone>=2.2.2
 weaviate-client>=3.24.0
 
 # Speech recognition and synthesis

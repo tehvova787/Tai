@@ -10,9 +10,59 @@ import json
 import logging
 import time
 import hashlib
-from typing import Dict, List, Optional, Union, Any
+from typing import Dict, List, Optional, Union, Any, Tuple
 from dotenv import load_dotenv
-import numpy as np
+
+# Try to import numpy, use a fallback if not available
+try:
+    import numpy as np
+    HAVE_NUMPY = True
+except ImportError:
+    HAVE_NUMPY = False
+    logger = logging.getLogger(__name__)
+    logger.warning(
+        "numpy not installed. Using fallback method for vector operations. "
+        "Install with: pip install numpy"
+    )
+    # Simple array class to use as fallback
+    class MockNumpy:
+        class ndarray(list):
+            def tobytes(self):
+                return str(self).encode()
+        
+        @staticmethod
+        def array(data, dtype=None):
+            return MockNumpy.ndarray(data)
+        
+        @staticmethod
+        def vstack(arrays):
+            return MockNumpy.ndarray([item for sublist in arrays for item in sublist])
+        
+        @staticmethod
+        def dot(a, b):
+            # Simple dot product implementation
+            if isinstance(a, list) and isinstance(b, list):
+                return sum(x*y for x,y in zip(a,b))
+            return 0.5  # Default similarity
+        
+        @staticmethod
+        def argmax(arr):
+            if not arr:
+                return 0
+            return arr.index(max(arr))
+        
+        @staticmethod
+        def linalg():
+            class Norm:
+                @staticmethod
+                def norm(v, axis=None, keepdims=False):
+                    if isinstance(v, list):
+                        return sum(x*x for x in v) ** 0.5
+                    return 1.0
+            return Norm()
+    
+    # Use the mock as a fallback
+    np = MockNumpy()
 
 # Configure logging
 logging.basicConfig(
@@ -48,6 +98,8 @@ try:
     QDRANT_AVAILABLE = True
 except ImportError:
     QDRANT_AVAILABLE = False
+    # Create a placeholder for type annotations
+    QdrantClient = Any  # For type annotations when the actual client isn't available
     logger.warning("qdrant_client package not available. Qdrant vector database will not be supported.")
 
 try:

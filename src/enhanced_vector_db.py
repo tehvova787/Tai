@@ -13,7 +13,40 @@ import os
 import time
 import logging
 import json
-import numpy as np
+# Try to import numpy, use a fallback if not available
+try:
+    import numpy as np
+    HAVE_NUMPY = True
+except ImportError:
+    HAVE_NUMPY = False
+    logger = logging.getLogger(__name__)
+    logger.warning(
+        "numpy not installed. Using fallback method for vector operations. "
+        "Install with: pip install numpy"
+    )
+    # Simple array class to use as fallback
+    class MockNumpy:
+        class ndarray(list):
+            def __init__(self, *args, **kwargs):
+                super().__init__(*args)
+                self.nbytes = 1024 * 1024  # Mock 1MB
+            
+            def tolist(self):
+                return list(self)
+            
+        @staticmethod
+        def array(data, dtype=None):
+            if isinstance(data, list):
+                return MockNumpy.ndarray(data)
+            return MockNumpy.ndarray([0.0] * 1536)  # Default size for embeddings
+        
+        @staticmethod
+        def float32():
+            return None
+    
+    # Use the mock as a fallback
+    np = MockNumpy()
+
 import threading
 import hashlib
 from typing import Dict, List, Any, Optional, Union, Tuple
@@ -711,4 +744,77 @@ def get_vector_db_manager(config: Dict = None) -> VectorDBManager:
     if _vector_db_manager is None:
         _vector_db_manager = VectorDBManager(config)
     
-    return _vector_db_manager 
+    return _vector_db_manager
+
+class EnhancedVectorDB:
+    """Enhanced vector database with advanced features."""
+    
+    def __init__(self, config: Dict = None):
+        """Initialize the enhanced vector database.
+        
+        Args:
+            config: Configuration dictionary
+        """
+        self.config = config or {}
+        self.manager = get_vector_db_manager(config)
+        
+        # Performance monitoring
+        self.performance_monitor_enabled = self.config.get("performance_monitor_enabled", True)
+        self.last_optimization_time = datetime.now() - timedelta(days=1)  # Force initial optimization
+        self.optimization_interval = timedelta(hours=self.config.get("optimization_interval_hours", 24))
+    
+    def add_documents(self, documents: List[Dict]) -> bool:
+        """Add documents to the vector database.
+        
+        Args:
+            documents: List of documents with 'content' and 'metadata' fields
+            
+        Returns:
+            True if successful, False otherwise
+        """
+        return self.manager.add_documents(documents)
+    
+    def search(self, query: str, top_k: int = 5, filter_criteria: Dict = None) -> List[Dict]:
+        """Search for similar documents.
+        
+        Args:
+            query: Search query
+            top_k: Number of results to return
+            filter_criteria: Filter criteria
+            
+        Returns:
+            List of search results
+        """
+        # Check if optimization is needed
+        if self.performance_monitor_enabled and (datetime.now() - self.last_optimization_time) > self.optimization_interval:
+            self.optimize()
+        
+        return self.manager.search(query, top_k, filter_criteria)
+    
+    def clear_cache(self) -> None:
+        """Clear the embedding cache."""
+        self.manager.clear_cache()
+    
+    def get_stats(self) -> Dict:
+        """Get vector database statistics.
+        
+        Returns:
+            Dictionary of statistics
+        """
+        return self.manager.get_stats()
+    
+    def optimize(self) -> None:
+        """Optimize the vector database."""
+        self.manager.optimize()
+        self.last_optimization_time = datetime.now()
+    
+    @contextmanager
+    def batch_operation(self):
+        """Context manager for batch operations.
+        
+        This is a placeholder for future batch operation optimization.
+        """
+        try:
+            yield
+        finally:
+            pass  # Additional cleanup if needed 
